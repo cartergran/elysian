@@ -1,9 +1,14 @@
 import styled from 'styled-components';
 import Chart from './chart';
+import Filter from './filter';
+
 import FundA from '../reports/fundA.json';
 
 const StyledDashboard = styled.div`
-  ${({ theme }) => theme.recycle.flexCenter};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-m);
 
   width: 100%;
 
@@ -14,6 +19,7 @@ const Dashboard = () => {
   return (
     <StyledDashboard>
       <Chart report={FundA.companyA} />
+      <Filter />
     </StyledDashboard>
   );
 };
