@@ -29,7 +29,7 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     },
 }));
 
-const filters = ['Q1', 'Q2', '1Y', '2Y'];
+const filters = ['1Q', '2Q', '1Y', '2Y'];
 
 const Filter = ({}) => {
   const [selected, setSelected] = useState(0);

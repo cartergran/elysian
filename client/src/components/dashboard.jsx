@@ -1,8 +1,10 @@
 import styled from 'styled-components';
 import Chart from './chart';
 import Filter from './filter';
+import Portfolio from './portfolio'
 
-import FundA from '../reports/fundA.json';
+import fundA from '../reports/fundA.json';
+import mockReport from '../reports/mockReport.json';
 
 const StyledDashboard = styled.div`
   display: flex;
@@ -16,10 +18,12 @@ const StyledDashboard = styled.div`
 `;
 
 const Dashboard = () => {
+
   return (
     <StyledDashboard>
-      <Chart report={FundA.companyA} />
+      <Chart report={fundA.companyA} />
       <Filter />
+      <Portfolio report={mockReport.investments} />
     </StyledDashboard>
   );
 };

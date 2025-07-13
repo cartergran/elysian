@@ -21,7 +21,7 @@ const Chart = ({ report }) => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="bump" dataKey="capital" stroke={theme.palette.secondary.main} />
+        <Line type="bump" dataKey="capital" stroke={theme.palette.primary.light} />
       </LineChart>
     </ResponsiveContainer>
   );
