@@ -27,7 +27,7 @@ const Portfolio = ({ report }) => {
         <TableBody>
             {
               report.map(({ company, investmentRounds }) => {
-                let currentInvestment = investmentRounds.pop();
+                let currentInvestment = investmentRounds.at(-1);
 
                 return (
                   <TableRow key={company}>

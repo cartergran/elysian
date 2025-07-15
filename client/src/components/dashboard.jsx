@@ -1,9 +1,9 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import Chart from './chart';
 import Filter from './filter';
 import Portfolio from './portfolio'
 
-import fundA from '../reports/fundA.json';
 import mockReport from '../reports/mockReport.json';
 
 const StyledDashboard = styled.div`
@@ -17,12 +17,28 @@ const StyledDashboard = styled.div`
   padding: var(--space-xl);
 `;
 
+const filters = {
+  '1Q': 2,
+  '2Q': 3,
+  '1Y': 5,
+  '2Y': 9
+};
+
 const Dashboard = () => {
+  const [funds, setFunds] = useState([mockReport]);
+  const [selectedFilter, setSelectedFilter] = useState(null);
 
   return (
     <StyledDashboard>
-      <Chart report={fundA.companyA} />
-      <Filter />
+      <Chart
+        funds={funds}
+        selectedFilter={selectedFilter}
+      />
+      <Filter
+        filters={filters}
+        selectedFilter={selectedFilter}
+        onFilterChange={setSelectedFilter}
+      />
       <Portfolio report={mockReport.investments} />
     </StyledDashboard>
   );

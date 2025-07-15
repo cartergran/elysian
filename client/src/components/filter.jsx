@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import ToggleButton, { toggleButtonClasses } from '@mui/material/ToggleButton';
 import ToggleButtonGroup, {toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
@@ -29,21 +28,19 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     },
 }));
 
-const filters = ['1Q', '2Q', '1Y', '2Y'];
-
-const Filter = ({}) => {
-  const [selected, setSelected] = useState(0);
-
+const Filter = ({ filters, selectedFilter, onFilterChange }) => {
   return (
     <StyledFilter>
       <StyledToggleButtonGroup
-        value={selected}
-        onChange={(_e, value) => setSelected(value)}
+        value={selectedFilter}
+        onChange={(_e, value) => onFilterChange(value)}
         exclusive
       >
         {
-          Object.entries(filters).map(([_, term], idx) => (
-            <ToggleButton key={idx} value={idx}>
+          // value := # of quarters + 1 (i.e. 1Y = 5)
+          // +1 bc 5 records shows the price over 4Q
+          Object.entries(filters).map(([term, value], idx) => (
+            <ToggleButton key={idx} value={value}>
               {term}
             </ToggleButton>
           ))
