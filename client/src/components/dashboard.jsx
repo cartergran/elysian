@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Chart from './chart';
 import Filter from './filter';
@@ -26,12 +26,27 @@ const filters = {
 
 const Dashboard = () => {
   const [funds, setFunds] = useState([mockReport]);
+  const [chartData, setChartData] = useState([]);
+  const [portfolioData, setPortfolioData] = useState([]);
+  // TODO: const [selectedFund, setSelectedFund] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState(null);
+
+  useEffect(() => {
+    if (selectedFilter) {
+      setChartData(funds[0].fundTotalValueByPeriod.slice(-selectedFilter));
+    } else {
+      setChartData(funds[0].fundTotalValueByPeriod);
+    }
+  }, [selectedFilter]);
+
+  useEffect(() => {
+    setPortfolioData(funds[0].investments);
+  }, []);
 
   return (
     <StyledDashboard>
       <Chart
-        funds={funds}
+        chartData={chartData}
         selectedFilter={selectedFilter}
       />
       <Filter
@@ -39,7 +54,11 @@ const Dashboard = () => {
         selectedFilter={selectedFilter}
         onFilterChange={setSelectedFilter}
       />
-      <Portfolio report={mockReport.investments} />
+      <Portfolio
+        portfolioData={portfolioData}
+        selectedFilter={selectedFilter}
+        // onFundChange={setSelectedFund}
+      />
     </StyledDashboard>
   );
 };

@@ -17,6 +17,6 @@ const Layout = ({ children }) => {
       </main>
     </StyledLayout>
   );
-}
+};
 
 export default Layout;

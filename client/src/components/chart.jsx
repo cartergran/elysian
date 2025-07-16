@@ -1,4 +1,3 @@
-// TODO: import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   Legend,
@@ -18,12 +17,12 @@ const StyledChart = styled(ResponsiveContainer)`
   }
 `;
 
-const Chart = ({ funds, selectedFilter }) => {
+const Chart = ({ chartData }) => {
   const theme = useTheme();
 
   return (
     <StyledChart width="80%" height={500}>
-      <LineChart data={funds[0].fundTotalValueByPeriod.slice(-selectedFilter)}>
+      <LineChart data={chartData}>
         <XAxis
           dataKey="period"
           stroke="white"
@@ -42,6 +41,6 @@ const Chart = ({ funds, selectedFilter }) => {
       </LineChart>
     </StyledChart>
   );
-}
+};
 
 export default Chart;

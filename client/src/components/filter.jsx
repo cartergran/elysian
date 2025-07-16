@@ -39,8 +39,8 @@ const Filter = ({ filters, selectedFilter, onFilterChange }) => {
         {
           // value := # of quarters + 1 (i.e. 1Y = 5)
           // +1 bc 5 records shows the price over 4Q
-          Object.entries(filters).map(([term, value], idx) => (
-            <ToggleButton key={idx} value={value}>
+          Object.entries(filters).map(([term, value]) => (
+            <ToggleButton key={term} value={value}>
               {term}
             </ToggleButton>
           ))
