@@ -17,7 +17,33 @@ const calcTrendPercent = (initialValue, currentValue) => {
   return ((valueChange / initialValue) * 100).toFixed(1);
 };
 
-const Portfolio = ({ portfolioData, selectedFilter }) => {
+const getCompanyView = (portfolioData, selectedFilter) => {
+  let companyView = portfolioData.map(({ company, investmentRounds }) => {
+    let isValidFilter =
+      selectedFilter != null && Math.abs(selectedFilter) <= investmentRounds.length;
+    let initialInvestment = investmentRounds.at(isValidFilter ? -selectedFilter : 0);
+    let currentInvestment = investmentRounds.at(-1);
+    let trendPercent = calcTrendPercent(
+      initialInvestment.totalValue,
+      currentInvestment.totalValue
+    );
+
+    return (
+      <TableRow key={company}>
+        <TableCell>{company}</TableCell>
+        <TableCell>{currentInvestment.investedCapital}</TableCell>
+        <TableCell>{currentInvestment.totalValue}</TableCell>
+        <TableCell>{`${trendPercent}%`}</TableCell>
+      </TableRow>
+    );
+  });
+
+  return companyView;
+};
+
+const views = [getCompanyView];
+
+const Portfolio = ({ view, portfolioData, selectedFund, selectedFilter, onFundChange }) => {
   return (
     <TableContainer>
       <Table>
@@ -31,27 +57,7 @@ const Portfolio = ({ portfolioData, selectedFilter }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-            {
-              portfolioData.map(({ company, investmentRounds }) => {
-                let isValidFilter =
-                  selectedFilter && Math.abs(selectedFilter) <= investmentRounds.length;
-                let initialInvestment = investmentRounds.at(isValidFilter ? -selectedFilter : 0);
-                let currentInvestment = investmentRounds.at(-1);
-                let trendPercent = calcTrendPercent(
-                    initialInvestment.totalValue,
-                    currentInvestment.totalValue
-                );
-
-                return (
-                  <TableRow key={company}>
-                      <TableCell>{company}</TableCell>
-                      <TableCell>{currentInvestment.investedCapital}</TableCell>
-                      <TableCell>{currentInvestment.totalValue}</TableCell>
-                      <TableCell>{`${trendPercent}%`}</TableCell>
-                  </TableRow>
-                );
-              })
-            }
+          { views[view](portfolioData, selectedFilter) }
         </TableBody>
       </Table>
     </TableContainer>

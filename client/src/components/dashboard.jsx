@@ -4,7 +4,9 @@ import Chart from './chart';
 import Filter from './filter';
 import Portfolio from './portfolio'
 
-import mockReport from '../reports/mockReport.json';
+import fundA from '../reports/atlastInnovationFund.json';
+import fundB from '../reports/equinoxVenturesFund.json';
+import fundC from '../reports/helixFrontierFund.json';
 
 const StyledDashboard = styled.div`
   display: flex;
@@ -25,22 +27,31 @@ const filters = {
 };
 
 const Dashboard = () => {
-  const [funds, setFunds] = useState([mockReport]);
+  const [view, setView] = useState(0);
+  const [funds, setFunds] = useState([fundA, fundB, fundC]);
   const [chartData, setChartData] = useState([]);
   const [portfolioData, setPortfolioData] = useState([]);
-  // TODO: const [selectedFund, setSelectedFund] = useState(null);
+  const [selectedFund, setSelectedFund] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState(null);
 
   useEffect(() => {
-    if (selectedFilter) {
-      setChartData(funds[0].fundTotalValueByPeriod.slice(-selectedFilter));
+    if (selectedFund != null && selectedFilter != null) {
+      setChartData(funds[selectedFund].fundTotalValueByPeriod.slice(-selectedFilter));
+    } else if (selectedFund != null) {
+      setChartData(funds[selectedFund].fundTotalValueByPeriod);
+    } else if (selectedFilter != null) {
+      setChartData(funds);
     } else {
-      setChartData(funds[0].fundTotalValueByPeriod);
+      setChartData(funds);
     }
   }, [selectedFilter]);
 
   useEffect(() => {
-    setPortfolioData(funds[0].investments);
+    if (selectedFund != null) {
+      setPortfolioData(funds[selectedFund].investments);
+    } else {
+      setPortfolioData(funds)
+    }
   }, []);
 
   return (
@@ -55,9 +66,11 @@ const Dashboard = () => {
         onFilterChange={setSelectedFilter}
       />
       <Portfolio
+        view={view}
         portfolioData={portfolioData}
+        selectedFund={selectedFund}
         selectedFilter={selectedFilter}
-        // onFundChange={setSelectedFund}
+        onFundChange={setSelectedFund}
       />
     </StyledDashboard>
   );
