@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Chart from './chart';
 import Filter from './filter';
 import Portfolio from './portfolio'
 
-import fundA from '../reports/atlastInnovationFund.json';
-import fundB from '../reports/equinoxVenturesFund.json';
-import fundC from '../reports/helixFrontierFund.json';
+import fundA from '../reports/nexacoreGrowthEquityFund.json';
+import fundB from '../reports/polarisFutureVenturesFund.json';
+import fundC from '../reports/vertexEdgeOpportunityFund.json';
 
 const StyledDashboard = styled.div`
   display: flex;
@@ -26,33 +26,40 @@ const filters = {
   '2Y': 9
 };
 
+const funds = [
+  fundA,
+  fundB,
+  fundC
+];
+
 const Dashboard = () => {
   const [view, setView] = useState(0);
-  const [funds, setFunds] = useState([fundA, fundB, fundC]);
-  const [chartData, setChartData] = useState([]);
-  const [portfolioData, setPortfolioData] = useState([]);
   const [selectedFund, setSelectedFund] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState(null);
 
-  useEffect(() => {
+  const chartData = useMemo(() => {
+    let res = [];
     if (selectedFund != null && selectedFilter != null) {
-      setChartData(funds[selectedFund].fundTotalValueByPeriod.slice(-selectedFilter));
+      res = funds[selectedFund].summary.investmentRounds.slice(-selectedFilter);
     } else if (selectedFund != null) {
-      setChartData(funds[selectedFund].fundTotalValueByPeriod);
+      res = funds[selectedFund].summary.investmentRounds;
     } else if (selectedFilter != null) {
-      setChartData(funds);
+      res = funds.map(({ summary }) => ({ summary: summary.slice(-selectedFilter) }));
     } else {
-      setChartData(funds);
+      res = funds.map(({ summary }) => ({ summary }));
     }
-  }, [selectedFilter]);
+    return res;
+  }, [selectedFund, selectedFilter]);
 
-  useEffect(() => {
+  const portfolioData = useMemo(() => {
+    let res = [];
     if (selectedFund != null) {
-      setPortfolioData(funds[selectedFund].investments);
+      res = funds[selectedFund].investments;
     } else {
-      setPortfolioData(funds)
+      res = funds.map(({ summary }) => ({ summary }));
     }
-  }, []);
+    return res;
+  }, [selectedFund, selectedFilter]);
 
   return (
     <StyledDashboard>
