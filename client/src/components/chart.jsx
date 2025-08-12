@@ -19,10 +19,11 @@ const StyledChart = styled(ResponsiveContainer)`
 
 const Chart = ({ chartData }) => {
   const theme = useTheme();
+  const { entityNames, totalValuesByPeriod } = chartData;
 
   return (
     <StyledChart width="80%" height={500}>
-      <LineChart data={chartData}>
+      <LineChart data={totalValuesByPeriod}>
         <XAxis
           dataKey="period"
           stroke="white"
@@ -32,12 +33,23 @@ const Chart = ({ chartData }) => {
           stroke="white"
           tickFormatter={(val) => `$${val}`}
         />
-        <Tooltip formatter={(val) => `$${val}`} />
-        <Legend />
-        <Line
-          dataKey="totalValue"
-          stroke={theme.palette.primary.light}
+        <Tooltip
+          labelFormatter={(label) => `Period: ${label}`}
+          labelStyle={{ color: 'black' }}
+          itemStyle={{ color: 'black' }}
         />
+        <Legend />
+
+        {
+          entityNames.map((entityName) => (
+            <Line
+              key={entityName}
+              name={entityName}
+              dataKey={entityName}
+              stroke="white"
+            />
+          ))
+        }
       </LineChart>
     </StyledChart>
   );
