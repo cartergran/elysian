@@ -40,7 +40,22 @@ const Dashboard = () => {
   const [selectedFund, setSelectedFund] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState(null);
 
-  // chartData := [{}]
+  /*
+    chartData := {
+      entityNames: [
+        [entityNameA],
+        [entityNameB],
+        [entityNameC],
+        ...
+      ],
+      totalValuesByPeriod: {
+        period,
+        [entityNameA]: totalValueA,
+        [entityNameB]: totalValueB,
+        [entityNameC]: totalValueC
+      }
+    }
+  */
   const chartData = useMemo(() => {
     let res = [];
     if (selectedFund != null) {

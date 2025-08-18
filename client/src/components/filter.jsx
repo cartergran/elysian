@@ -17,14 +17,14 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     {
       borderTopLeftRadius: theme.shape.borderRadius,
       borderBottomLeftRadius: theme.shape.borderRadius,
-      borderLeft: `1px solid ${theme.palette.secondary.main}`,
+      borderLeft: `${theme.shape.borderWidth}px solid ${theme.palette.secondary.main}`,
     },
   [`
     & .${toggleButtonGroupClasses.lastButton}.${toggleButtonClasses.disabled},
     & .${toggleButtonGroupClasses.middleButton}.${toggleButtonClasses.disabled}`
   ]:
     {
-      borderLeft: `1px solid ${theme.palette.action.disabled}`,
+      borderLeft: `${theme.shape.borderWidth}px solid ${theme.palette.action.disabled}`,
     },
 }));
 

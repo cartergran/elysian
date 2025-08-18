@@ -1,19 +1,21 @@
 // TODO: = (data, dataPoint = 'totalValue')
-const toChartData = (data) => {
+const toChartData = (data, dataPoint = 'totalValue') => {
   let periodMap = new Map();
 
-  Object.entries(data).forEach(([ entityName, investmentRounds ], idx) => {
-    investmentRounds.forEach(({ period, totalValue }) => {
+  Object.entries(data).forEach(([ entityName, investmentRounds ]) => {
+    investmentRounds.forEach(({ period, ...investmentRound }) => {
+      let dataPointValue = investmentRound[dataPoint];
+
       if (!periodMap.has(period)) {
         periodMap.set(period, { period });
       }
-      periodMap.get(period)[entityName] = totalValue ;
+      periodMap.get(period)[entityName] = dataPointValue ;
     });
   });
 
   return {
     entityNames: Object.keys(data),
-    totalValuesByPeriod: Array.from(periodMap.values())
+    [`${dataPoint}ByPeriod`]: Array.from(periodMap.values())
   };
 };
 

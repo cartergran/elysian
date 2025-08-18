@@ -16,12 +16,25 @@ const muiTheme = createTheme({
     },
     action: {
       disabled: '#A0A0A0'
-    }
+    },
+    charts: [
+      '#aec7e8',
+      '#ffbb78',
+      '#98df8a',
+      '#ff9896',
+      '#c5b0d5',
+      '#c49c94',
+      '#f7b6d2',
+      '#c7c7c7',
+      '#dbdb8d',
+      '#9edae5'
+    ]
   },
   typography: {
     fontFamily: 'Roboto'
   },
   shape: {
+    borderWidth: 2,
     borderRadius: 8
   }
 });
@@ -32,7 +45,7 @@ const extendedMuiTheme = createTheme(muiTheme, {
       styleOverrides: {
         root: {
           borderColor: muiTheme.palette.secondary.main,
-          borderWidth: 2,
+          borderWidth: muiTheme.shape.borderWidth,
           borderRadius: muiTheme.shape.borderRadius,
           color: muiTheme.palette.secondary.main,
           '&:hover': {
