@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Chart from './chart';
 import Filter from './filter';
@@ -45,15 +45,23 @@ const Dashboard = () => {
       entityNames: [
         [entityNameA],
         [entityNameB],
-        [entityNameC],
         ...
       ],
-      totalValuesByPeriod: {
-        period,
-        [entityNameA]: totalValueA,
-        [entityNameB]: totalValueB,
-        [entityNameC]: totalValueC
-      }
+      totalValuesByPeriod: [
+        {
+          period: [periodOne],
+          [entityNameA]: totalValueA,
+          [entityNameB]: totalValueB,
+          ...
+        },
+        {
+          period: [periodTwo],
+          [entityNameA]: totalValueA,
+          [entityNameB]: totalValueB,
+          ...
+        },
+        ...
+      ]
     }
   */
   const chartData = useMemo(() => {
@@ -83,12 +91,28 @@ const Dashboard = () => {
     return toChartData(res);
   }, [selectedFund, selectedFilter]);
 
+  /*
+    portfolioData := [
+      {
+        company: [companyA],
+        investmentRounds: {...}
+      },
+      {
+        company: [companyB],
+        investmentRounds: {...}
+      },
+      ...
+    ]
+  */
   const portfolioData = useMemo(() => {
     let res = [];
     if (selectedFund != null) {
       res = funds[selectedFund].investments;
     } else {
-      res = funds.map(({ summary }) => ({ summary }));
+      res = funds.map(({ fundName, investmentRoundsSummary }) => ({
+        fundName,
+        investmentRoundsSummary
+      }));
     }
     return res;
   }, [selectedFund, selectedFilter]);
@@ -104,15 +128,13 @@ const Dashboard = () => {
         selectedFilter={selectedFilter}
         onFilterChange={setSelectedFilter}
       />
-      {/*
-        <Portfolio
-          view={view}
-          portfolioData={portfolioData}
-          selectedFund={selectedFund}
-          selectedFilter={selectedFilter}
-          onFundChange={setSelectedFund}
-        />
-      */}
+      <Portfolio
+        view={view}
+        portfolioData={portfolioData}
+        selectedFund={selectedFund}
+        selectedFilter={selectedFilter}
+        onFundChange={setSelectedFund}
+      />
     </StyledDashboard>
   );
 };

@@ -34,7 +34,18 @@ const getTrendPercent = (currentInvestment, investments, selectedFilter) => {
   );
 };
 
+const formatCurrency = (value) => {
+  if (value == null || isNaN(value)) return 'N/A';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  }).format(value);
+};
+
 export {
   toChartData,
-  getTrendPercent
+  getTrendPercent,
+  formatCurrency
 };
