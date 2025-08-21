@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Chart from './chart';
 import Filter from './filter';
@@ -36,12 +36,11 @@ const funds = [
 ];
 
 const Dashboard = () => {
-  const [view, setView] = useState(0);
   const [selectedFund, setSelectedFund] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState(null);
 
   /*
-    chartData := {
+    toChartData() := {
       entityNames: [
         [entityNameA],
         [entityNameB],
@@ -65,14 +64,14 @@ const Dashboard = () => {
     }
   */
   const chartData = useMemo(() => {
-    let res = [];
+    let res = {};
     if (selectedFund != null) {
       // fund view
       let fund = funds[selectedFund];
       if (selectedFilter != null) {
-        res.push({ [fund.fundName]: fund.investmentRoundsSummary.slice(-selectedFilter) });
+        res = { [fund.fundName]: fund.investmentRoundsSummary.slice(-selectedFilter) };
       } else {
-        res.push({ [fund.fundName]: fund.investmentRoundsSummary });
+        res = { [fund.fundName]: fund.investmentRoundsSummary };
       }
     } else {
       // home view
@@ -88,6 +87,7 @@ const Dashboard = () => {
         }, {});
       }
     }
+
     return toChartData(res);
   }, [selectedFund, selectedFilter]);
 
@@ -117,6 +117,10 @@ const Dashboard = () => {
     return res;
   }, [selectedFund, selectedFilter]);
 
+  const handleSelectedFund = useCallback((fundIdx) => {
+    setSelectedFund(fundIdx);
+  }, []);
+
   return (
     <StyledDashboard>
       <Chart
@@ -129,11 +133,10 @@ const Dashboard = () => {
         onFilterChange={setSelectedFilter}
       />
       <Portfolio
-        view={view}
         portfolioData={portfolioData}
         selectedFund={selectedFund}
         selectedFilter={selectedFilter}
-        onFundChange={setSelectedFund}
+        onSelectedFund={handleSelectedFund}
       />
     </StyledDashboard>
   );

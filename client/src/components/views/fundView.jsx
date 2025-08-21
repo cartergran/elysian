@@ -5,7 +5,7 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { getTrendPercent } from '../../utils/investments';
+import { formatCurrency, getTrendPercent } from '../../utils/investments';
 
 const FUND_HEADERS = [
   'Company',
@@ -43,8 +43,8 @@ const FundView = ({ portfolioData, selectedFilter }) => {
           fundRows.map(({ company, investedCapital, totalValue, trendPercent }) => (
             <TableRow key={company}>
               <TableCell>{company}</TableCell>
-              <TableCell>{investedCapital}</TableCell>
-              <TableCell>{totalValue}</TableCell>
+              <TableCell>{formatCurrency(investedCapital)}</TableCell>
+              <TableCell>{formatCurrency(totalValue)}</TableCell>
               <TableCell>{`${trendPercent}%`}</TableCell>
             </TableRow>
           ))

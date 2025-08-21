@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import {
+  Link,
   TableBody,
   TableCell,
   TableHead,
   TableRow
 } from '@mui/material';
-import { getTrendPercent, formatCurrency } from '../../utils/investments';
+import { formatCurrency, getTrendPercent } from '../../utils/investments';
 
 const HOME_HEADERS = [
   'Fund',
@@ -17,9 +18,9 @@ const HOME_HEADERS = [
   'Trend'
 ];
 
-const HomeView = ({ portfolioData, selectedFilter }) => {
+const HomeView = ({ portfolioData, selectedFilter, onSelectedFund }) => {
 
-  const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }) => {
+  const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }, idx) => {
     let currentInvestment = investmentRoundsSummary.at(-1);
     let trendPercent = getTrendPercent(
       currentInvestment,
@@ -29,7 +30,11 @@ const HomeView = ({ portfolioData, selectedFilter }) => {
 
     return (
       <TableRow key={fundName} hover>
-        <TableCell>{fundName}</TableCell>
+        <TableCell>
+          <Link component="button" underline="hover" onClick={() => onSelectedFund(idx)}>
+            {fundName}
+          </Link>
+        </TableCell>
         <TableCell>{formatCurrency(currentInvestment.investedCapital)}</TableCell>
         <TableCell>{formatCurrency(currentInvestment.realizedValue)}</TableCell>
         <TableCell>{formatCurrency(currentInvestment.unrealizedValue)}</TableCell>

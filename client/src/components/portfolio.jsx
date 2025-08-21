@@ -7,13 +7,18 @@ import FundView from './views/fundView';
 
 const views = [HomeView, FundView];
 
-const Portfolio = ({ view, portfolioData, selectedFund, selectedFilter, onFundChange }) => {
+const Portfolio = ({ portfolioData, selectedFund, selectedFilter, onSelectedFund }) => {
+  const view = selectedFund != null ? 1 : 0;
   const ViewComponent = views[view] || (() => null);
 
   return (
     <TableContainer>
       <Table>
-        <ViewComponent portfolioData={portfolioData} selectedFilter={selectedFilter} />
+        <ViewComponent
+          portfolioData={portfolioData}
+          selectedFilter={selectedFilter}
+          onSelectedFund={onSelectedFund}
+        />
       </Table>
     </TableContainer>
   );
