@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import {
+  Label,
   Legend,
   LineChart,
   Line,
@@ -17,6 +18,15 @@ const StyledChart = styled(ResponsiveContainer)`
   }
 `;
 
+const YAxisLabel = (
+  <Label
+    value="Total Value (USD)"
+    angle={-90}
+    position="center"
+    dx={-30}
+  />
+);
+
 const Chart = ({ chartData }) => {
   const theme = useTheme();
   const { entityNames, totalValueByPeriod } = chartData;
@@ -31,15 +41,22 @@ const Chart = ({ chartData }) => {
           tickFormatter={(val) => val.split('-').at(-1) }
         />
         <YAxis
+          label={YAxisLabel}
           stroke="white"
           tickFormatter={(val) => `$${val}`}
         />
         <Tooltip
-          labelFormatter={(label) => `Period: ${label}`}
-          labelStyle={{ color: 'black' }}
           itemStyle={{ color: 'black' }}
+          labelStyle={{ color: 'black' }}
+          labelFormatter={(label) => `Period: ${label}`}
         />
-        <Legend />
+        <Legend
+          align="right"
+          verticalAlign="top"
+          iconSize={8}
+          iconType="circle"
+          labelStyle={{ color: 'black' }}
+        />
 
         {
           entityNames.map((entityName, i) => (
