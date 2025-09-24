@@ -37,7 +37,7 @@ const funds = [
 
 const Dashboard = () => {
   const [selectedFund, setSelectedFund] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState(filters['2Y']);
 
   /*
     toChartData() := {
@@ -117,15 +117,10 @@ const Dashboard = () => {
     return res;
   }, [selectedFund, selectedFilter]);
 
-  const handleSelectedFund = useCallback((fundIdx) => {
-    setSelectedFund(fundIdx);
-  }, []);
-
   return (
     <StyledDashboard>
       <Chart
         chartData={chartData}
-        selectedFilter={selectedFilter}
       />
       <Filter
         filters={filters}
@@ -136,7 +131,7 @@ const Dashboard = () => {
         portfolioData={portfolioData}
         selectedFund={selectedFund}
         selectedFilter={selectedFilter}
-        onSelectedFund={handleSelectedFund}
+        onSelectedFund={setSelectedFund}
       />
     </StyledDashboard>
   );
