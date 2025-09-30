@@ -1,8 +1,9 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Chart from './chart';
 import Filter from './filter';
-import Portfolio from './portfolio'
+import HeaderBar from './headerbar';
+import Portfolio from './portfolio';
 
 import { toChartData } from '../utils/investments';
 
@@ -35,9 +36,24 @@ const funds = [
   fundC
 ];
 
+const homeTitle = 'Financial Overview';
+const getBreadcrumbs = (selectedFund, selectedCompany) => {
+  let res = [{ label: homeTitle, onClickArg: null }];
+  if (selectedFund != null) {
+    let fundName = funds[selectedFund].fundName;
+    res.push({ label: fundName, onClickArg: selectedFund });
+  }
+  if (selectedCompany) {
+    // TODO
+  }
+  return res;
+};
+
 const Dashboard = () => {
   const [selectedFund, setSelectedFund] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState(filters['2Y']);
+
+  const breadcrumbs = getBreadcrumbs(selectedFund);
 
   /*
     toChartData() := {
@@ -119,6 +135,10 @@ const Dashboard = () => {
 
   return (
     <StyledDashboard>
+      <HeaderBar
+        breadcrumbs={breadcrumbs}
+        onBreadcrumbClick={setSelectedFund}
+      />
       <Chart
         chartData={chartData}
       />
