@@ -28,20 +28,20 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     },
 }));
 
-const Filter = ({ filters, selectedFilter, onFilterChange }) => {
+const Filter = ({ options, selected, onChange }) => {
   return (
     <StyledFilter>
       <StyledToggleButtonGroup
-        value={selectedFilter}
-        onChange={(_e, value) => onFilterChange(value)}
+        value={selected}
+        onChange={(e) => onChange(e.target.value)}
         exclusive
       >
         {
           // value := # of quarters + 1 (i.e. 1Y = 5)
           // +1 bc 5 records shows the price over 4Q
-          Object.entries(filters).map(([term, value]) => (
-            <ToggleButton key={term} value={value}>
-              {term}
+          options.map(({ label }) => (
+            <ToggleButton key={label} value={label}>
+              {label}
             </ToggleButton>
           ))
         }

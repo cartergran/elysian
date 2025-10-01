@@ -22,14 +22,15 @@ const StyledDashboard = styled.div`
   padding: var(--space-xl);
 `;
 
-const filters = {
-  '1Q': 2,
-  '2Q': 3,
-  '1Y': 5,
-  '2Y': 9
-};
+const FILTERS = [
+  { label: '1Q', period: 1 },
+  { label: '2Q', period: 2 },
+  { label: '1Y', period: 4 },
+  { label: '2Y', period: 8 },
+  { label: 'ALL', period: Infinity }
+];
+const lastPeriod = (p, arr) => (p === Infinity ? arr : arr.slice(-(p + 1)));
 
-// funds := [{}]
 const funds = [
   fundA,
   fundB,
@@ -51,8 +52,9 @@ const getBreadcrumbs = (selectedFund, selectedCompany) => {
 
 const Dashboard = () => {
   const [selectedFund, setSelectedFund] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState(filters['2Y']);
+  const [filter, setFilter] = useState('ALL');
 
+  const filteredPeriod = FILTERS.find(f => f.label === filter).period;
   const breadcrumbs = getBreadcrumbs(selectedFund);
 
   /*
@@ -84,28 +86,17 @@ const Dashboard = () => {
     if (selectedFund != null) {
       // fund view
       let fund = funds[selectedFund];
-      if (selectedFilter != null) {
-        res = { [fund.fundName]: fund.investmentRoundsSummary.slice(-selectedFilter) };
-      } else {
-        res = { [fund.fundName]: fund.investmentRoundsSummary };
-      }
+      res = { [fund.fundName]: lastPeriod(filteredPeriod, fund.investmentRoundsSummary) };
     } else {
       // home view
-      if (selectedFilter != null) {
-        res = funds.reduce((acc, fund) => {
-          acc[fund.fundName] = fund.investmentRoundsSummary.slice(-selectedFilter);
-          return acc;
-        }, {});
-      } else {
-        res = funds.reduce((acc, fund) => {
-          acc[fund.fundName] = fund.investmentRoundsSummary;
-          return acc;
-        }, {});
-      }
+      res = funds.reduce((acc, fund) => {
+        acc[fund.fundName] = lastPeriod(filteredPeriod, fund.investmentRoundsSummary);
+        return acc;
+      }, {});
     }
 
     return toChartData(res);
-  }, [selectedFund, selectedFilter]);
+  }, [selectedFund, filter]);
 
   /*
     portfolioData := [
@@ -131,7 +122,7 @@ const Dashboard = () => {
       }));
     }
     return res;
-  }, [selectedFund, selectedFilter]);
+  }, [selectedFund]);
 
   return (
     <StyledDashboard>
@@ -143,14 +134,14 @@ const Dashboard = () => {
         chartData={chartData}
       />
       <Filter
-        filters={filters}
-        selectedFilter={selectedFilter}
-        onFilterChange={setSelectedFilter}
+        options={FILTERS}
+        selected={filter}
+        onChange={setFilter}
       />
       <Portfolio
         portfolioData={portfolioData}
         selectedFund={selectedFund}
-        selectedFilter={selectedFilter}
+        filteredPeriod={filteredPeriod}
         onSelectedFund={setSelectedFund}
       />
     </StyledDashboard>

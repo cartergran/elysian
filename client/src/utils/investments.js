@@ -24,9 +24,9 @@ const calcTrendPercent = (initialValue, currentValue) => {
   return ((valueChange / initialValue) * 100).toFixed(1);
 };
 
-const getTrendPercent = (currentInvestment, investments, selectedFilter) => {
-  let isValidFilter = selectedFilter != null && selectedFilter < investments.length;
-  let initialInvestment = investments.at(isValidFilter ? -selectedFilter : 0);
+const getTrendPercent = (currentInvestment, investments, filteredPeriod) => {
+  let isValidFilter = filteredPeriod < investments.length;
+  let initialInvestment = investments.at(isValidFilter ? -filteredPeriod : 0);
 
   return calcTrendPercent(
     initialInvestment.totalValue,

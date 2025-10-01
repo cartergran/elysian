@@ -18,14 +18,14 @@ const HOME_HEADERS = [
   'Trend'
 ];
 
-const HomeView = ({ portfolioData, selectedFilter, onSelectedFund }) => {
+const HomeView = ({ portfolioData, filteredPeriod, onSelectedFund }) => {
 
   const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }, idx) => {
     let currentInvestment = investmentRoundsSummary.at(-1);
     let trendPercent = getTrendPercent(
       currentInvestment,
       investmentRoundsSummary,
-      selectedFilter
+      filteredPeriod
     );
 
     return (
@@ -43,7 +43,7 @@ const HomeView = ({ portfolioData, selectedFilter, onSelectedFund }) => {
         <TableCell>{`${trendPercent}%`}</TableCell>
       </TableRow>
     );
-  }), [portfolioData, selectedFilter]);
+  }), [portfolioData, filteredPeriod]);
 
   return (
     <>

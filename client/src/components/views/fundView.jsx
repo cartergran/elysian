@@ -14,13 +14,13 @@ const FUND_HEADERS = [
   'Trend'
 ];
 
-const FundView = ({ portfolioData, selectedFilter }) => {
+const FundView = ({ portfolioData, filteredPeriod }) => {
   const fundRows = useMemo(() => portfolioData.map(({ company, investmentRounds }) => {
     let currentInvestment = investmentRounds.at(-1);
     let trendPercent = getTrendPercent(
       currentInvestment,
       investmentRounds,
-      selectedFilter
+      filteredPeriod
     );
 
     return {
@@ -29,7 +29,7 @@ const FundView = ({ portfolioData, selectedFilter }) => {
       totalValue: currentInvestment.totalValue,
       trendPercent
     };
-  }), [portfolioData, selectedFilter]);
+  }), [portfolioData, filteredPeriod]);
 
   return (
     <>
