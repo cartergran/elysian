@@ -30,13 +30,14 @@ const muiTheme = createTheme({
       '#9edae5'
     ]
   },
-  typography: {
-    fontFamily: 'Roboto'
-  },
   shape: {
     borderWidth: 1,
     borderRadius: 8
-  }
+  },
+  spacing: 8,
+  typography: {
+    fontFamily: 'Roboto'
+  },
 });
 
 const extendedMuiTheme = createTheme(muiTheme, {

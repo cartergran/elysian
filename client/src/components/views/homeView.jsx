@@ -15,7 +15,7 @@ const HOME_HEADERS = [
   'Unrealized Value',
   'Total Value',
   'Gross IRR',
-  'Trend'
+  'Return'
 ];
 
 const HomeView = ({ portfolioData, filteredPeriod, onSelectedFund }) => {
@@ -39,7 +39,7 @@ const HomeView = ({ portfolioData, filteredPeriod, onSelectedFund }) => {
         <TableCell>{formatCurrency(currentInvestment.realizedValue)}</TableCell>
         <TableCell>{formatCurrency(currentInvestment.unrealizedValue)}</TableCell>
         <TableCell>{formatCurrency(currentInvestment.totalValue)}</TableCell>
-        <TableCell>{formatCurrency(currentInvestment.grossIRR)}</TableCell>
+        <TableCell>{`${currentInvestment.grossIRR}%`}</TableCell>
         <TableCell>{`${trendPercent}%`}</TableCell>
       </TableRow>
     );

@@ -18,19 +18,13 @@ const StyledChart = styled(ResponsiveContainer)`
   }
 `;
 
-const YAxisLabel = (
-  <Label
-    value="Total Value (USD)"
-    angle={-90}
-    position="center"
-    dx={-30}
-  />
-);
-
 const Chart = ({ chartData }) => {
   const theme = useTheme();
+
   const { entityNames, totalValueByPeriod } = chartData;
   const chartColors = theme.palette.charts || [];
+  const firstPeriod = totalValueByPeriod.at(0)?.period;
+  const lastPeriod = totalValueByPeriod.at(-1)?.period;
 
   return (
     <StyledChart height={500}>
@@ -38,10 +32,16 @@ const Chart = ({ chartData }) => {
         <XAxis
           dataKey="period"
           stroke="white"
-          tickFormatter={(val) => val.split('-').at(-1) }
+          tick={{ dy: parseInt(theme.spacing(1)) }}
+          ticks={[firstPeriod, lastPeriod]}
+          tickFormatter={(val) => {let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}`}} // tmp
         />
         <YAxis
-          label={YAxisLabel}
+          label={{
+            value: 'Total Value (USD)',
+            angle: -90,
+            dx: -parseInt(theme.spacing(3)),
+          }}
           stroke="white"
           tickFormatter={(val) => `$${val}`}
         />

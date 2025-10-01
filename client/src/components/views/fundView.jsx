@@ -11,7 +11,7 @@ const FUND_HEADERS = [
   'Company',
   'Invested Capital',
   'Total Value',
-  'Trend'
+  'Return'
 ];
 
 const FundView = ({ portfolioData, filteredPeriod }) => {
