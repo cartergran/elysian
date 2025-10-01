@@ -29,33 +29,34 @@ const FILTERS = [
   { label: '2Y', period: 8 },
   { label: 'ALL', period: Infinity }
 ];
-const lastPeriod = (p, arr) => (p === Infinity ? arr : arr.slice(-(p + 1)));
+const lastPeriod = (p, arr) => p === Infinity ? arr : arr.slice(-(p + 1));
 
-const funds = [
+const FUNDS = [
   fundA,
   fundB,
   fundC
 ];
+const FUNDS_BY_NAME = FUNDS.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {});
 
 const homeTitle = 'Financial Overview';
-const getBreadcrumbs = (selectedFund, selectedCompany) => {
-  let res = [{ label: homeTitle, onClickArg: null }];
-  if (selectedFund != null) {
-    let fundName = funds[selectedFund].fundName;
-    res.push({ label: fundName, onClickArg: selectedFund });
+const getBreadcrumbs = (fundName, companyName) => {
+  let res = [homeTitle];
+  if (fundName != null) {
+    res.push(fundName);
   }
-  if (selectedCompany) {
+  if (companyName != null) {
     // TODO
   }
   return res;
 };
 
 const Dashboard = () => {
-  const [selectedFund, setSelectedFund] = useState(null);
+  const [fundName, setFundName] = useState(null);
   const [filter, setFilter] = useState('ALL');
 
+  const fund = fundName ? FUNDS_BY_NAME[fundName] : null;
   const filteredPeriod = FILTERS.find(f => f.label === filter).period;
-  const breadcrumbs = getBreadcrumbs(selectedFund);
+  const breadcrumbs = getBreadcrumbs(fundName);
 
   /*
     toChartData() := {
@@ -83,20 +84,19 @@ const Dashboard = () => {
   */
   const chartData = useMemo(() => {
     let res = {};
-    if (selectedFund != null) {
+    if (fund != null) {
       // fund view
-      let fund = funds[selectedFund];
       res = { [fund.fundName]: lastPeriod(filteredPeriod, fund.investmentRoundsSummary) };
     } else {
       // home view
-      res = funds.reduce((acc, fund) => {
-        acc[fund.fundName] = lastPeriod(filteredPeriod, fund.investmentRoundsSummary);
+      res = FUNDS.reduce((acc, f) => {
+        acc[f.fundName] = lastPeriod(filteredPeriod, f.investmentRoundsSummary);
         return acc;
       }, {});
     }
 
     return toChartData(res);
-  }, [selectedFund, filter]);
+  }, [fund, filteredPeriod]);
 
   /*
     portfolioData := [
@@ -113,22 +113,22 @@ const Dashboard = () => {
   */
   const portfolioData = useMemo(() => {
     let res = [];
-    if (selectedFund != null) {
-      res = funds[selectedFund].investments;
+    if (fund != null) {
+      res = fund.investments;
     } else {
-      res = funds.map(({ fundName, investmentRoundsSummary }) => ({
+      res = FUNDS.map(({ fundName, investmentRoundsSummary }) => ({
         fundName,
         investmentRoundsSummary
       }));
     }
     return res;
-  }, [selectedFund]);
+  }, [fund]);
 
   return (
     <StyledDashboard>
       <HeaderBar
         breadcrumbs={breadcrumbs}
-        onBreadcrumbClick={setSelectedFund}
+        onBreadcrumbClick={setFundName}
       />
       <Chart
         chartData={chartData}
@@ -140,9 +140,9 @@ const Dashboard = () => {
       />
       <Portfolio
         portfolioData={portfolioData}
-        selectedFund={selectedFund}
         filteredPeriod={filteredPeriod}
-        onSelectedFund={setSelectedFund}
+        fundName={fundName}
+        onSelectedFund={setFundName}
       />
     </StyledDashboard>
   );

@@ -20,7 +20,7 @@ const StyledBreadcrumbs = styled.div`
   gap: var(--space-m);
 
   // tmp
-  .crumb {
+  & .crumb {
     cursor: pointer;
   }
 `;
@@ -44,9 +44,9 @@ const HeaderBar = ({ breadcrumbs, trendPercent, onBreadcrumbClick }) => {
                   fontWeight="bold"
                   variant="h5"
                   underline={idx === breadcrumbs.length - 1 ? 'none' : 'hover'}
-                  onClick={() => onBreadcrumbClick(breadcrumb.onClickArg)}
+                  onClick={() => onBreadcrumbClick(idx === 0 ? null : breadcrumb)}
                 >
-                  {breadcrumb.label}
+                  {breadcrumb}
                 </Link>
               ))
             }

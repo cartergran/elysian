@@ -20,7 +20,7 @@ const HOME_HEADERS = [
 
 const HomeView = ({ portfolioData, filteredPeriod, onSelectedFund }) => {
 
-  const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }, idx) => {
+  const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }) => {
     let currentInvestment = investmentRoundsSummary.at(-1);
     let trendPercent = getTrendPercent(
       currentInvestment,
@@ -29,9 +29,9 @@ const HomeView = ({ portfolioData, filteredPeriod, onSelectedFund }) => {
     );
 
     return (
-      <TableRow key={fundName} hover>
+      <TableRow key={fundName}>
         <TableCell>
-          <Link component="button" underline="hover" onClick={() => onSelectedFund(idx)}>
+          <Link component="button" underline="hover" onClick={() => onSelectedFund(fundName)}>
             {fundName}
           </Link>
         </TableCell>
