@@ -34,7 +34,7 @@ const muiTheme = createTheme({
     fontFamily: 'Roboto'
   },
   shape: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 8
   }
 });
@@ -68,6 +68,13 @@ const extendedMuiTheme = createTheme(muiTheme, {
             fontWeight: 700,
             letterSpacing: '0.5px'
           }
+        }
+      }
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: muiTheme.palette.primary.light,
         }
       }
     }

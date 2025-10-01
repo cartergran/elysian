@@ -33,7 +33,7 @@ const Chart = ({ chartData }) => {
   const chartColors = theme.palette.charts || [];
 
   return (
-    <StyledChart width="80%" height={500}>
+    <StyledChart height={500}>
       <LineChart data={totalValueByPeriod}>
         <XAxis
           dataKey="period"
