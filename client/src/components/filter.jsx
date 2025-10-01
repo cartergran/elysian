@@ -33,14 +33,14 @@ const Filter = ({ options, selected, onChange }) => {
     <StyledFilter>
       <StyledToggleButtonGroup
         value={selected}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(Number(e.target.value))}
         exclusive
       >
         {
           // value := # of quarters + 1 (i.e. 1Y = 5)
           // +1 bc 5 records shows the price over 4Q
-          options.map(({ label }) => (
-            <ToggleButton key={label} value={label}>
+          options.map(({ label, period }) => (
+            <ToggleButton key={label} value={period}>
               {label}
             </ToggleButton>
           ))

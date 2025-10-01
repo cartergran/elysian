@@ -52,10 +52,9 @@ const getBreadcrumbs = (fundName, companyName) => {
 
 const Dashboard = () => {
   const [fundName, setFundName] = useState(null);
-  const [filter, setFilter] = useState('ALL');
+  const [filterPeriod, setFilterPeriod] = useState(Infinity);
 
   const fund = fundName ? FUNDS_BY_NAME[fundName] : null;
-  const filteredPeriod = FILTERS.find(f => f.label === filter).period;
   const breadcrumbs = getBreadcrumbs(fundName);
 
   /*
@@ -86,17 +85,17 @@ const Dashboard = () => {
     let res = {};
     if (fund != null) {
       // fund view
-      res = { [fund.fundName]: lastPeriod(filteredPeriod, fund.investmentRoundsSummary) };
+      res = { [fund.fundName]: lastPeriod(filterPeriod, fund.investmentRoundsSummary) };
     } else {
       // home view
       res = FUNDS.reduce((acc, f) => {
-        acc[f.fundName] = lastPeriod(filteredPeriod, f.investmentRoundsSummary);
+        acc[f.fundName] = lastPeriod(filterPeriod, f.investmentRoundsSummary);
         return acc;
       }, {});
     }
 
     return toChartData(res);
-  }, [fund, filteredPeriod]);
+  }, [fund, filterPeriod]);
 
   /*
     portfolioData := [
@@ -135,12 +134,12 @@ const Dashboard = () => {
       />
       <Filter
         options={FILTERS}
-        selected={filter}
-        onChange={setFilter}
+        selected={filterPeriod}
+        onChange={setFilterPeriod}
       />
       <Portfolio
         portfolioData={portfolioData}
-        filteredPeriod={filteredPeriod}
+        filterPeriod={filterPeriod}
         fundName={fundName}
         onSelectedFund={setFundName}
       />
