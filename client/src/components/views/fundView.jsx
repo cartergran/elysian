@@ -5,7 +5,7 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { formatCurrency, getTrendPercent } from '../../utils/investments';
+import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
 const FUND_HEADERS = [
   'Company',
@@ -14,22 +14,22 @@ const FUND_HEADERS = [
   'Return'
 ];
 
-const FundView = ({ portfolioData, filteredPeriod }) => {
+const FundView = ({ portfolioData, filterPeriod }) => {
   const fundRows = useMemo(() => portfolioData.map(({ companyName, investmentRounds }) => {
     let currentInvestment = investmentRounds.at(-1);
-    let trendPercent = getTrendPercent(
+    let returnPercent = getReturnPercent(
       currentInvestment,
       investmentRounds,
-      filteredPeriod
+      filterPeriod
     );
 
     return {
       companyName,
       investedCapital: currentInvestment.investedCapital,
       totalValue: currentInvestment.totalValue,
-      trendPercent
+      returnPercent
     };
-  }), [portfolioData, filteredPeriod]);
+  }), [portfolioData, filterPeriod]);
 
   return (
     <>
@@ -40,12 +40,12 @@ const FundView = ({ portfolioData, filteredPeriod }) => {
       </TableHead>
       <TableBody>
         {
-          fundRows.map(({ companyName, investedCapital, totalValue, trendPercent }) => (
+          fundRows.map(({ companyName, investedCapital, totalValue, returnPercent }) => (
             <TableRow key={companyName}>
               <TableCell>{companyName}</TableCell>
               <TableCell>{formatCurrency(investedCapital)}</TableCell>
               <TableCell>{formatCurrency(totalValue)}</TableCell>
-              <TableCell>{`${trendPercent}%`}</TableCell>
+              <TableCell>{`${returnPercent}%`}</TableCell>
             </TableRow>
           ))
         }

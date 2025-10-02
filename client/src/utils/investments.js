@@ -19,16 +19,17 @@ const toChartData = (data, dataPoint = 'totalValue') => {
   };
 };
 
-const calcTrendPercent = (initialValue, currentValue) => {
+const calcReturnPercent = (initialValue, currentValue) => {
   let valueChange = currentValue - initialValue;
   return ((valueChange / initialValue) * 100).toFixed(1);
 };
 
-const getTrendPercent = (currentInvestment, investments, filteredPeriod) => {
-  let isValidFilter = filteredPeriod < investments.length;
-  let initialInvestment = investments.at(isValidFilter ? -filteredPeriod : 0);
+const getReturnPercent = (currentInvestment, investments, filterPeriod) => {
+  let initialIdx = filterPeriod + 1;
+  let isValidIdx = initialIdx < investments.length;
+  let initialInvestment = investments.at(isValidIdx ? -initialIdx : 0);
 
-  return calcTrendPercent(
+  return calcReturnPercent(
     initialInvestment.totalValue,
     currentInvestment.totalValue
   );
@@ -46,6 +47,6 @@ const formatCurrency = (value) => {
 
 export {
   toChartData,
-  getTrendPercent,
+  getReturnPercent,
   formatCurrency
 };

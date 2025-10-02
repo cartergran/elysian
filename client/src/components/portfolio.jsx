@@ -10,7 +10,7 @@ const views = {
   FUND: FundView
 };
 
-const Portfolio = ({ portfolioData, filteredPeriod, view, onSelectedFund }) => {
+const Portfolio = ({ portfolioData, filterPeriod, view, onSelectedFund }) => {
   const ViewComponent = views[view.mode] || (() => null);
 
   return (
@@ -18,7 +18,7 @@ const Portfolio = ({ portfolioData, filteredPeriod, view, onSelectedFund }) => {
       <Table>
         <ViewComponent
           portfolioData={portfolioData}
-          filteredPeriod={filteredPeriod}
+          filterPeriod={filterPeriod}
           onSelectedFund={onSelectedFund}
         />
       </Table>

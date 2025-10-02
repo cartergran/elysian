@@ -6,7 +6,7 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { formatCurrency, getTrendPercent } from '../../utils/investments';
+import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
 const HOME_HEADERS = [
   'Fund',
@@ -18,14 +18,14 @@ const HOME_HEADERS = [
   'Return'
 ];
 
-const HomeView = ({ portfolioData, filteredPeriod, onSelectedFund }) => {
+const HomeView = ({ portfolioData, filterPeriod, onSelectedFund }) => {
 
   const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }) => {
     let currentInvestment = investmentRoundsSummary.at(-1);
-    let trendPercent = getTrendPercent(
+    let returnPercent = getReturnPercent(
       currentInvestment,
       investmentRoundsSummary,
-      filteredPeriod
+      filterPeriod
     );
 
     return (
@@ -40,10 +40,10 @@ const HomeView = ({ portfolioData, filteredPeriod, onSelectedFund }) => {
         <TableCell>{formatCurrency(currentInvestment.unrealizedValue)}</TableCell>
         <TableCell>{formatCurrency(currentInvestment.totalValue)}</TableCell>
         <TableCell>{`${currentInvestment.grossIRR}%`}</TableCell>
-        <TableCell>{`${trendPercent}%`}</TableCell>
+        <TableCell>{`${returnPercent}%`}</TableCell>
       </TableRow>
     );
-  }), [portfolioData, filteredPeriod]);
+  }), [portfolioData, filterPeriod]);
 
   return (
     <>
