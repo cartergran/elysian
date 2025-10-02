@@ -5,11 +5,13 @@ import {
 import HomeView from './views/homeView';
 import FundView from './views/fundView';
 
-const views = [HomeView, FundView];
+const views = {
+  HOME: HomeView,
+  FUND: FundView
+};
 
-const Portfolio = ({ portfolioData, filteredPeriod, fundName, onSelectedFund }) => {
-  const view = fundName != null ? 1 : 0;
-  const ViewComponent = views[view] || (() => null);
+const Portfolio = ({ portfolioData, filteredPeriod, view, onSelectedFund }) => {
+  const ViewComponent = views[view.mode] || (() => null);
 
   return (
     <TableContainer>

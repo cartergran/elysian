@@ -4,7 +4,7 @@
   "inceptionDate": "2023-01-01",
   "investments": [
     {
-      "company": "GeneFlux Labs",
+      "companyName": "GeneFlux Labs",
       "sector": "Biotech",
       "investmentRounds": [
         {
@@ -82,7 +82,7 @@
       ]
     },
     {
-      "company": "UrbanBeam",
+      "companyName": "UrbanBeam",
       "sector": "Smart Infrastructure",
       "investmentRounds": [
         {
@@ -160,7 +160,7 @@
       ]
     },
     {
-      "company": "Ecliptic Robotics",
+      "companyName": "Ecliptic Robotics",
       "sector": "Automation",
       "investmentRounds": [
         {
@@ -238,7 +238,7 @@
       ]
     },
     {
-      "company": "AgriPulse",
+      "companyName": "AgriPulse",
       "sector": "Precision Agriculture",
       "investmentRounds": [
         {
@@ -316,7 +316,7 @@
       ]
     },
     {
-      "company": "QuantaLynx",
+      "companyName": "QuantaLynx",
       "sector": "Quantum Computing",
       "investmentRounds": [
         {
@@ -394,7 +394,7 @@
       ]
     },
     {
-      "company": "MobiusChain",
+      "companyName": "MobiusChain",
       "sector": "Blockchain Logistics",
       "investmentRounds": [
         {

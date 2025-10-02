@@ -4,7 +4,7 @@
   "inceptionDate": "2023-01-01",
   "investments": [
     {
-      "company": "NeuroVista Therapeutics",
+      "companyName": "NeuroVista Therapeutics",
       "sector": "Neurotechnology",
       "investmentRounds": [
         {
@@ -82,7 +82,7 @@
       ]
     },
     {
-      "company": "EcoForge Materials",
+      "companyName": "EcoForge Materials",
       "sector": "Sustainable Manufacturing",
       "investmentRounds": [
         {
@@ -160,7 +160,7 @@
       ]
     },
     {
-      "company": "StratosLink",
+      "companyName": "StratosLink",
       "sector": "Satellite Communications",
       "investmentRounds": [
         {
@@ -238,7 +238,7 @@
       ]
     },
     {
-      "company": "FinSight AI",
+      "companyName": "FinSight AI",
       "sector": "Financial Analytics",
       "investmentRounds": [
         {
@@ -316,7 +316,7 @@
       ]
     },
     {
-      "company": "HydroBloom",
+      "companyName": "HydroBloom",
       "sector": "Hydroponics",
       "investmentRounds": [
         {
@@ -394,7 +394,7 @@
       ]
     },
     {
-      "company": "NanoFleet Systems",
+      "companyName": "NanoFleet Systems",
       "sector": "Nano Robotics",
       "investmentRounds": [
         {

@@ -1,3 +1,4 @@
+import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
 const StyledLayout = styled.div`
@@ -9,11 +10,11 @@ const StyledLayout = styled.div`
   flex-direction: column;
 `;
 
-const Layout = ({ children }) => {
+const Layout = () => {
   return (
     <StyledLayout>
       <main>
-        { children }
+        <Outlet />
       </main>
     </StyledLayout>
   );

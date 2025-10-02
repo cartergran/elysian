@@ -4,7 +4,7 @@
   "inceptionDate": "2023-01-01",
   "investments": [
     {
-      "company": "Ardent Bioworks",
+      "companyName": "Ardent Bioworks",
       "sector": "Life Sciences",
       "investmentRounds": [
         {
@@ -82,7 +82,7 @@
       ]
     },
     {
-      "company": "SkySynth Aero",
+      "companyName": "SkySynth Aero",
       "sector": "Aerospace Technology",
       "investmentRounds": [
         {
@@ -160,7 +160,7 @@
       ]
     },
     {
-      "company": "TerraGrid Systems",
+      "companyName": "TerraGrid Systems",
       "sector": "Green Infrastructure",
       "investmentRounds": [
         {
@@ -238,7 +238,7 @@
       ]
     },
     {
-      "company": "Cognivault",
+      "companyName": "Cognivault",
       "sector": "Data Security",
       "investmentRounds": [
         {
@@ -316,7 +316,7 @@
       ]
     },
     {
-      "company": "LuminoTech",
+      "companyName": "LuminoTech",
       "sector": "Optical Computing",
       "investmentRounds": [
         {
@@ -394,7 +394,7 @@
       ]
     },
     {
-      "company": "HarvestIQ",
+      "companyName": "HarvestIQ",
       "sector": "AgriTech AI",
       "investmentRounds": [
         {

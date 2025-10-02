@@ -15,7 +15,7 @@ const FUND_HEADERS = [
 ];
 
 const FundView = ({ portfolioData, filteredPeriod }) => {
-  const fundRows = useMemo(() => portfolioData.map(({ company, investmentRounds }) => {
+  const fundRows = useMemo(() => portfolioData.map(({ companyName, investmentRounds }) => {
     let currentInvestment = investmentRounds.at(-1);
     let trendPercent = getTrendPercent(
       currentInvestment,
@@ -24,7 +24,7 @@ const FundView = ({ portfolioData, filteredPeriod }) => {
     );
 
     return {
-      company,
+      companyName,
       investedCapital: currentInvestment.investedCapital,
       totalValue: currentInvestment.totalValue,
       trendPercent
@@ -40,9 +40,9 @@ const FundView = ({ portfolioData, filteredPeriod }) => {
       </TableHead>
       <TableBody>
         {
-          fundRows.map(({ company, investedCapital, totalValue, trendPercent }) => (
-            <TableRow key={company}>
-              <TableCell>{company}</TableCell>
+          fundRows.map(({ companyName, investedCapital, totalValue, trendPercent }) => (
+            <TableRow key={companyName}>
+              <TableCell>{companyName}</TableCell>
               <TableCell>{formatCurrency(investedCapital)}</TableCell>
               <TableCell>{formatCurrency(totalValue)}</TableCell>
               <TableCell>{`${trendPercent}%`}</TableCell>

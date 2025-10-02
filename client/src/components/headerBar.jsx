@@ -25,7 +25,7 @@ const StyledBreadcrumbs = styled.div`
   }
 `;
 
-const HeaderBar = ({ breadcrumbs, trendPercent, onBreadcrumbClick }) => {
+const HeaderBar = ({ crumbs, view, onCrumbClick }) => {
   return (
     <AppBar 
       position="static"
@@ -38,26 +38,21 @@ const HeaderBar = ({ breadcrumbs, trendPercent, onBreadcrumbClick }) => {
           </IconButton>
           <Breadcrumbs color="secondary" separator=">">
             {
-              breadcrumbs.map((breadcrumb, idx) => (
+              crumbs.map((crumb, idx) => (
                 <Link
                   className="crumb"
                   fontWeight="bold"
                   variant="h5"
-                  underline={idx === breadcrumbs.length - 1 ? 'none' : 'hover'}
-                  onClick={() => onBreadcrumbClick(idx === 0 ? null : breadcrumb)}
+                  underline={idx === crumbs.length - 1 ? 'none' : 'hover'}
+                  onClick={() => onCrumbClick(idx)}
                 >
-                  {breadcrumb}
+                  {crumb}
                 </Link>
               ))
             }
           </Breadcrumbs>
         </StyledBreadcrumbs>
-        {
-          trendPercent && 
-            <Typography color="secondary" fontWeight="medium" variant="body2">
-              {trendPercent}
-            </Typography>
-        }
+        { /* TODO: view */ }
       </StyledToolBar>
     </AppBar>
   );
