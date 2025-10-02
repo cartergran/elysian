@@ -7,7 +7,7 @@ const StyledFilter = styled.div`
 `;
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-  gap: 'var(--space-xl)',
+  gap: theme.spacing(4),
   [`& .${toggleButtonGroupClasses.firstButton}, & .${toggleButtonGroupClasses.middleButton}`]:
     {
       borderTopRightRadius: theme.shape.borderRadius,

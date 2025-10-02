@@ -17,7 +17,7 @@ const StyledToolBar = styled(Toolbar)`
 const StyledBreadcrumbs = styled.div`
   display: flex;
   align-items: center;
-  gap: var(--space-m);
+  gap: ${({ theme }) => theme.spacing(2)};
 
   // tmp
   & .crumb {
@@ -57,7 +57,7 @@ const HeaderBar = ({ breadcrumbs, trendPercent, onBreadcrumbClick }) => {
             <Typography color="secondary" fontWeight="medium" variant="body2">
               {trendPercent}
             </Typography>
-        } 
+        }
       </StyledToolBar>
     </AppBar>
   );

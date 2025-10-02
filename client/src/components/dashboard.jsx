@@ -15,11 +15,11 @@ const StyledDashboard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-m);
+  gap: ${({ theme }) => theme.spacing(2)};
 
   width: 100%;
 
-  padding: var(--space-xl);
+  padding: ${({ theme }) => theme.spacing(4)};
 `;
 
 const FILTERS = [
