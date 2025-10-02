@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Chart from './chart';
 import Filter from './filter';
-import HeaderBar from './headerbar';
+import HeaderBar from './headerBar';
 import Portfolio from './portfolio';
 
 import { toChartData } from '../utils/investments';
