@@ -42,22 +42,6 @@ const FUNDS = [
 const FUNDS_BY_NAME = FUNDS.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {});
 
 const homeTitle = 'Financial Overview';
-const getCrumbs = (fundName, companyName) => {
-  let res = [homeTitle];
-  if (fundName != null) {
-    res.push(fundName);
-  }
-  if (companyName != null) {
-    // TODO
-  }
-  return res;
-};
-
-const getView = (fundName, companyName) => {
-  if (fundName && companyName) { return { mode: 'COMPANY', params: { fundName, companyName } }; }
-  if (fundName) { return { mode: 'FUND', params: { fundName } } };
-  return { mode: 'HOME', params: {} };
-};
 
 const Dashboard = () => {
   const nav = useNavigate();
@@ -69,8 +53,17 @@ const Dashboard = () => {
   const fund = fundName ? FUNDS_BY_NAME[fundName] : null;
   const companyName = companySlug && fund ? deslugify(companySlug, FUNDS, fund) : null;
 
-  const crumbs = getCrumbs(fundName, companyName);
-  const view = getView(fundName, companyName);
+  const crumbs = useMemo(() => {
+    let res = [homeTitle];
+    if (fundName != null) { res.push(fundName); }
+    if (companyName != null) { /* TODO */ }
+    return res;
+  }, [fundName, companyName]);
+  const view = useMemo(() => {
+    if (fundName && companyName) { return { mode: 'COMPANY', params: { fundName, companyName } }; }
+    if (fundName) { return { mode: 'FUND', params: { fundName } } };
+    return { mode: 'HOME', params: {} };
+  }, [fundName, companyName]);
 
   const goHome = () => nav('/');
   const goFund = (f) => nav(`/fund/${slugify(f)}`);
