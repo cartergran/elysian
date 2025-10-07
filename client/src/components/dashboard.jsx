@@ -62,6 +62,7 @@ const getView = (fundName, companyName) => {
 const Dashboard = () => {
   const nav = useNavigate();
   const { fundSlug, companySlug } = useParams();
+  const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
 
   const fundName = fundSlug ? deslugify(fundSlug, FUNDS) : null;
@@ -108,7 +109,12 @@ const Dashboard = () => {
     let res = {};
     if (view.mode === 'FUND') {
       // fund view
-      res = { [fund.fundName]: lastPeriod(filterPeriod, fund.investmentRoundsSummary) };
+      res = chartCompanies
+        ? fund.investments.reduce((acc, i) => {
+            acc[i.companyName] = lastPeriod(filterPeriod, i.investmentRounds);
+            return acc;
+          }, {})
+        : { [fund.fundName]: lastPeriod(filterPeriod, fund.investmentRoundsSummary) };
     } else {
       // home view
       res = FUNDS.reduce((acc, f) => {
@@ -118,7 +124,7 @@ const Dashboard = () => {
     }
 
     return toChartData(res);
-  }, [filterPeriod, fund, view]);
+  }, [chartCompanies, filterPeriod, fund, view]);
 
   /*
     portfolioData := [
@@ -152,6 +158,7 @@ const Dashboard = () => {
         crumbs={crumbs}
         view={view}
         onCrumbClick={(idx) => navByIdx[idx]()}
+        onSwitchChange={(e) => setChartCompanies(e.target.checked)}
       />
       <Chart
         chartData={chartData}

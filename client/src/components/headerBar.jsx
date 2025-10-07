@@ -5,10 +5,12 @@ import {
   Container, // margins
   IconButton,
   Link,
-  Toolbar,
-  Typography
+  Toolbar
 } from "@mui/material";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
+import Switch from './switch';
 
 const StyledToolBar = styled(Toolbar)`
   justify-content: space-between;
@@ -25,7 +27,17 @@ const StyledBreadcrumbs = styled.div`
   }
 `;
 
-const HeaderBar = ({ crumbs, view, onCrumbClick }) => {
+const StyledUploadIcon = styled(CloudUploadIcon)`
+  font-size: 40px;
+  transition: transform 1s ease;
+
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.25);
+  }
+`;
+
+const HeaderBar = ({ crumbs, view, onCrumbClick, onSwitchChange }) => {
   return (
     <AppBar 
       position="static"
@@ -52,7 +64,11 @@ const HeaderBar = ({ crumbs, view, onCrumbClick }) => {
             }
           </Breadcrumbs>
         </StyledBreadcrumbs>
-        { /* TODO: view */ }
+        {
+          view.mode === 'HOME'
+            ? <StyledUploadIcon />
+            : <Switch label="Companies" onChange={onSwitchChange} />
+        }
       </StyledToolBar>
     </AppBar>
   );

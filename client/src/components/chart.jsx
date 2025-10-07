@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import {
-  Label,
   Legend,
   LineChart,
   Line,
