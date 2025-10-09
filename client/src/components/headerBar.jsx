@@ -45,7 +45,7 @@ const HeaderBar = ({ crumbs, view, onCrumbClick, onSwitchChange }) => {
     >
       <StyledToolBar>
         <StyledBreadcrumbs>
-          <IconButton color="secondary" onClick={() => onBreadcrumbClick(null)}>
+          <IconButton color="secondary" onClick={() => onCrumbClick(null)}>
             <ShowChartIcon />
           </IconButton>
           <Breadcrumbs color="secondary" separator=">">

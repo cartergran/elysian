@@ -17,27 +17,27 @@ const StyledChart = styled(ResponsiveContainer)`
   }
 `;
 
-const Chart = ({ chartData }) => {
+const Chart = ({ chartData, yLabel = 'Total Value' }) => {
   const theme = useTheme();
 
-  const { entityNames, totalValueByPeriod } = chartData;
+  const { entityNames, dataPointsPerPeriod } = chartData;
   const chartColors = theme.palette.charts || [];
-  const firstPeriod = totalValueByPeriod.at(0)?.period;
-  const lastPeriod = totalValueByPeriod.at(-1)?.period;
+  const firstPeriod = dataPointsPerPeriod.at(0)?.period;
+  const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
 
   return (
     <StyledChart height={500}>
-      <LineChart data={totalValueByPeriod}>
+      <LineChart data={dataPointsPerPeriod}>
         <XAxis
           dataKey="period"
           stroke="white"
           tick={{ dy: parseInt(theme.spacing(1)) }}
           ticks={[firstPeriod, lastPeriod]}
-          tickFormatter={(val) => {let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}`}} // tmp
+          tickFormatter={(val) => { let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}` }} // tmp
         />
         <YAxis
           label={{
-            value: 'Total Value (USD)',
+            value: `${yLabel} (USD)`,
             angle: -90,
             dx: -parseInt(theme.spacing(3)),
           }}

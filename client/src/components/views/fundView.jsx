@@ -1,21 +1,23 @@
-import { useMemo } from 'react';
 import {
+  Link, // TODO
   TableBody,
-  TableCell,
   TableHead,
   TableRow
 } from '@mui/material';
+import { StyledHeaderCell, StyledBodyCell } from '../portfolio';
+import { useMemo } from 'react';
+
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
-const FUND_HEADERS = [
-  'Company',
-  'Invested Capital',
-  'Total Value',
-  'Return'
-];
-
-const FundView = ({ portfolioData, filterPeriod }) => {
-  const fundRows = useMemo(() => portfolioData.map(({ companyName, investmentRounds }) => {
+const FundView = ({
+  columnHeadersByDataPoint,
+  portfolioData,
+  selectableColumnHeaders,
+  selectedColumn,
+  filterPeriod,
+  onColumnHeaderClick
+}) => {
+  const rows = useMemo(() => portfolioData.map(({ companyName, investmentRounds }) => {
     let currentInvestment = investmentRounds.at(-1);
     let returnPercent = getReturnPercent(
       currentInvestment,
@@ -35,19 +37,45 @@ const FundView = ({ portfolioData, filterPeriod }) => {
     <>
       <TableHead>
         <TableRow>
-          { FUND_HEADERS.map((title) => <TableCell key={title}>{title}</TableCell>) }
+          {
+            Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
+              <StyledHeaderCell
+                key={title}
+                $selectable={selectableColumnHeaders.includes(title)}
+                $selected={idx === selectedColumn?.idx}
+                onClick={() =>
+                  selectableColumnHeaders.includes(title) &&
+                  onColumnHeaderClick(idx, title, dataPoint)
+                }
+              >
+                {title}
+              </StyledHeaderCell>
+            ))
+          }
         </TableRow>
       </TableHead>
       <TableBody>
         {
-          fundRows.map(({ companyName, investedCapital, totalValue, returnPercent }) => (
-            <TableRow key={companyName}>
-              <TableCell>{companyName}</TableCell>
-              <TableCell>{formatCurrency(investedCapital)}</TableCell>
-              <TableCell>{formatCurrency(totalValue)}</TableCell>
-              <TableCell>{`${returnPercent}%`}</TableCell>
-            </TableRow>
-          ))
+          rows.map(({ companyName, totalValue, investedCapital, returnPercent }) => {
+            let cells = [
+              companyName,
+              formatCurrency(totalValue),
+              formatCurrency(investedCapital),
+              `${returnPercent}%`
+            ];
+
+            return (
+              <TableRow key={companyName}>
+                {
+                  cells.map((cell, idx) => (
+                    <StyledBodyCell key={idx} $selected={idx === selectedColumn?.idx}>
+                      {cell}
+                    </StyledBodyCell>
+                  ))
+                }
+              </TableRow>
+            );
+          })
         }
       </TableBody>
     </>

@@ -15,7 +15,7 @@ const toChartData = (data, dataPoint = 'totalValue') => {
 
   return {
     entityNames: Object.keys(data),
-    [`${dataPoint}ByPeriod`]: Array.from(periodMap.values())
+    dataPointsPerPeriod: Array.from(periodMap.values())
   };
 };
 

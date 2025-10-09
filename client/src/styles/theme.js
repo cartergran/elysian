@@ -15,7 +15,8 @@ const muiTheme = createTheme({
       primary: '#FDB927'
     },
     action: {
-      disabled: '#A0A0A0'
+      disabled: '#A0A0A0',
+      highlighted: '#2A2A2A'
     },
     charts: [
       '#aec7e8',

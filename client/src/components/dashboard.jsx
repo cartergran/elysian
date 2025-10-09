@@ -48,6 +48,7 @@ const Dashboard = () => {
   const { fundSlug, companySlug } = useParams();
   const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
+  const [selectedColumn, setSelectedColumn] = useState(null);
 
   const fundName = fundSlug ? deslugify(fundSlug, FUNDS) : null;
   const fund = fundName ? FUNDS_BY_NAME[fundName] : null;
@@ -116,8 +117,8 @@ const Dashboard = () => {
       }, {});
     }
 
-    return toChartData(res);
-  }, [chartCompanies, filterPeriod, fund, view]);
+    return toChartData(res, selectedColumn?.dataPoint);
+  }, [chartCompanies, filterPeriod, fund, selectedColumn, view]);
 
   /*
     portfolioData := [
@@ -150,11 +151,12 @@ const Dashboard = () => {
       <HeaderBar
         crumbs={crumbs}
         view={view}
-        onCrumbClick={(idx) => navByIdx[idx]()}
+        onCrumbClick={(idx) => { setSelectedColumn(null); navByIdx[idx](); }}
         onSwitchChange={(e) => setChartCompanies(e.target.checked)}
       />
       <Chart
         chartData={chartData}
+        yLabel={selectedColumn?.title}
       />
       <Filter
         options={FILTERS}
@@ -164,8 +166,10 @@ const Dashboard = () => {
       <Portfolio
         portfolioData={portfolioData}
         filterPeriod={filterPeriod}
+        selectedColumn={selectedColumn}
         view={view}
-        onSelectedFund={goFund}
+        onColumnHeaderClick={(idx, title, dataPoint) => setSelectedColumn({ idx, title, dataPoint })}
+        onFundNameClick={(fundName) => { setSelectedColumn(null); goFund(fundName); }}
       />
     </StyledDashboard>
   );
