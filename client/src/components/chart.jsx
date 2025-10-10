@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import {
   Legend,
   LineChart,
@@ -6,8 +5,11 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis,
+  YAxis
 } from 'recharts';
+import styled from 'styled-components';
+import { useMediaQuery } from '@mui/material';
+import { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
 const StyledChart = styled(ResponsiveContainer)`
@@ -19,21 +21,36 @@ const StyledChart = styled(ResponsiveContainer)`
 
 const Chart = ({ chartData, yLabel = 'Total Value' }) => {
   const theme = useTheme();
+  const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
   const { entityNames, dataPointsPerPeriod } = chartData;
   const chartColors = theme.palette.charts || [];
   const firstPeriod = dataPointsPerPeriod.at(0)?.period;
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
+  const periodTickFormatter = (val) => { let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}` };
+
+  const responsive = useMemo(() => {
+    const height = isLargeViewport ? 500 : 400;
+    const tickFontSize = theme.typography.tick[isLargeViewport ? 'large' : 'small'].fontSize;
+
+    return {
+      height,
+      tickFontSize
+    }
+  }, [isLargeViewport, theme]);
 
   return (
-    <StyledChart height={500}>
+    <StyledChart height={responsive.height}>
       <LineChart data={dataPointsPerPeriod}>
         <XAxis
           dataKey="period"
           stroke="white"
-          tick={{ dy: parseInt(theme.spacing(1)) }}
+          tick={{
+            dy: parseInt(theme.spacing(1)),
+            fontSize: responsive.tickFontSize
+          }}
           ticks={[firstPeriod, lastPeriod]}
-          tickFormatter={(val) => { let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}` }} // tmp
+          tickFormatter={periodTickFormatter}
         />
         <YAxis
           label={{
@@ -42,6 +59,7 @@ const Chart = ({ chartData, yLabel = 'Total Value' }) => {
             dx: -parseInt(theme.spacing(3)),
           }}
           stroke="white"
+          tick={{ fontSize: responsive.tickFontSize }}
           tickFormatter={(val) => `$${val}`}
         />
         <Tooltip
@@ -49,14 +67,6 @@ const Chart = ({ chartData, yLabel = 'Total Value' }) => {
           labelStyle={{ color: 'black' }}
           labelFormatter={(label) => `Period: ${label}`}
         />
-        <Legend
-          align="right"
-          verticalAlign="top"
-          iconSize={8}
-          iconType="circle"
-          labelStyle={{ color: 'black' }}
-        />
-
         {
           entityNames.map((entityName, i) => (
             <Line
@@ -66,6 +76,16 @@ const Chart = ({ chartData, yLabel = 'Total Value' }) => {
               stroke={chartColors[i % chartColors.length]}
             />
           ))
+        }
+        {
+          isLargeViewport &&
+            <Legend
+              align="right"
+              verticalAlign="top"
+              iconSize={8}
+              iconType="circle"
+              labelStyle={{ color: 'black' }}
+            />
         }
       </LineChart>
     </StyledChart>

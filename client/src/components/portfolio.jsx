@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 
-
 const StyledBaseCell = styled(TableCell)`
   background-color:
     ${({ $selected, theme }) => $selected ? theme.palette.action.highlighted : 'transparent'};

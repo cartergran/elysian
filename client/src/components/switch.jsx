@@ -1,4 +1,10 @@
-import { Box, Switch as MUISwitch, Typography } from '@mui/material';
+import {
+  Box,
+  Switch as MUISwitch,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import styled from 'styled-components';
 
 const StyledSwitch = styled(Box)`
@@ -11,14 +17,17 @@ const StyledSwitch = styled(Box)`
 `;
 
 const Switch = ({ label, onChange }) => {
+  const theme = useTheme();
+  const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
+
   return (
     <StyledSwitch>
       <MUISwitch
         color="secondary"
-        size="large"
+        size={isLargeViewport ? 'large' : 'small'}
         onChange={onChange}
       />
-      <Typography variant="h5">{label}</Typography>
+      { isLargeViewport && <Typography variant='body1'>{label}</Typography> }
     </StyledSwitch>
   );
 };

@@ -28,6 +28,16 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     },
 }));
 
+const StyledToggleButton = styled(ToggleButton)`
+  font-size: ${({ theme }) => theme.typography.body2.fontSize};
+  padding: ${({ theme }) => theme.spacing(0.75)};
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    font-size: ${({ theme }) => theme.typography.body1.fontSize};
+    padding: ${({ theme }) => theme.spacing(1)};
+  }
+`;
+
 const Filter = ({ options, selected, onChange }) => {
   return (
     <StyledFilter>
@@ -37,12 +47,12 @@ const Filter = ({ options, selected, onChange }) => {
         exclusive
       >
         {
-          // value := # of quarters + 1 (i.e. 1Y = 5)
+          // period := # of quarters + 1 (i.e. 1Y = 5)
           // +1 bc 5 records shows the price over 4Q
           options.map(({ label, period }) => (
-            <ToggleButton key={label} value={period}>
+            <StyledToggleButton key={label} value={period}>
               {label}
-            </ToggleButton>
+            </StyledToggleButton>
           ))
         }
       </StyledToggleButtonGroup>

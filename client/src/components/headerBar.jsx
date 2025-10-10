@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import {
   AppBar,
   Breadcrumbs,
-  Container, // margins
   IconButton,
   Link,
   Toolbar
@@ -20,20 +19,29 @@ const StyledBreadcrumbs = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing(2)};
+`;
 
-  // tmp
-  & .crumb {
-    cursor: pointer;
+const StyledCrumbLink = styled(Link)`
+  cursor: ${({ $isLast }) => $isLast ? 'default' : 'pointer'};
+  font-weight: bold;
+  text-decoration: none;
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    font-size: ${({ theme }) => theme.typography.h6.fontSize};
   }
 `;
 
 const StyledUploadIcon = styled(CloudUploadIcon)`
-  font-size: 40px;
+  font-size: 1.5rem;
   transition: transform 1s ease;
 
   &:hover {
     cursor: pointer;
     transform: scale(1.25);
+  }
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    font-size: 2rem;
   }
 `;
 
@@ -51,15 +59,13 @@ const HeaderBar = ({ crumbs, view, onCrumbClick, onSwitchChange }) => {
           <Breadcrumbs color="secondary" separator=">">
             {
               crumbs.map((crumb, idx) => (
-                <Link
-                  className="crumb"
-                  fontWeight="bold"
-                  variant="h5"
-                  underline={idx === crumbs.length - 1 ? 'none' : 'hover'}
+                <StyledCrumbLink
+                  variant="subtitle1"
+                  $isLast={idx === crumbs.length - 1}
                   onClick={() => onCrumbClick(idx)}
                 >
                   {crumb}
-                </Link>
+                </StyledCrumbLink>
               ))
             }
           </Breadcrumbs>
