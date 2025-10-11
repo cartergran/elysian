@@ -7,18 +7,21 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 
-const StyledBaseCell = styled(TableCell)`
-  background-color:
-    ${({ $selected, theme }) => $selected ? theme.palette.action.highlighted : 'transparent'};
-  transition: background-color 0.25s ease-in;
-`;
-
-export const StyledHeaderCell = styled(StyledBaseCell)`
+export const StyledHeaderCell = styled(TableCell)`
+  color:
+    ${({ $selected, theme }) => $selected
+      ? theme.palette.primary.light
+      : theme.palette.secondary.main
+    };
+  font-size:
+    ${({ $selected, theme }) => $selected
+      ? theme.typography.subtitle1.fontSize
+      : theme.typography.subtitle2.fontSize
+    };
   cursor: ${({ $selectable }) => $selectable ? 'pointer' : 'default'};
+  transition: all 0.25s ease-in-out;
   user-select: none;
 `;
-
-export const StyledBodyCell = styled(StyledBaseCell)``;
 
 const COLUMN_HEADERS_BY_DATA_POINT = {
   HOME: {

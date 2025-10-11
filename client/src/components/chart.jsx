@@ -53,11 +53,11 @@ const Chart = ({ chartData, yLabel = 'Total Value' }) => {
           tickFormatter={periodTickFormatter}
         />
         <YAxis
-          label={{
-            value: `${yLabel} (USD)`,
-            angle: -90,
-            dx: -parseInt(theme.spacing(3)),
-          }}
+          // label={{
+          //   value: `${yLabel} (USD)`,
+          //   angle: -90,
+          //   dx: -parseInt(theme.spacing(3)),
+          // }}
           stroke="white"
           tick={{ fontSize: responsive.tickFontSize }}
           tickFormatter={(val) => `$${val}`}

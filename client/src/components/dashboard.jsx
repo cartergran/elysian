@@ -41,21 +41,27 @@ const FUNDS = [
 ];
 const FUNDS_BY_NAME = FUNDS.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {});
 
-const homeTitle = 'Financial Overview';
+const HOME_TITLE = 'Financial Overview';
+
+const DEFAULT_COLUMN = {
+  idx: 1,
+  title: 'Total Value',
+  dataPoint: 'totalValue'
+};
 
 const Dashboard = () => {
   const nav = useNavigate();
   const { fundSlug, companySlug } = useParams();
   const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
-  const [selectedColumn, setSelectedColumn] = useState(null);
+  const [selectedColumn, setSelectedColumn] = useState(DEFAULT_COLUMN);
 
   const fundName = fundSlug ? deslugify(fundSlug, FUNDS) : null;
   const fund = fundName ? FUNDS_BY_NAME[fundName] : null;
   const companyName = companySlug && fund ? deslugify(companySlug, FUNDS, fund) : null;
 
   const crumbs = useMemo(() => {
-    let res = [homeTitle];
+    let res = [HOME_TITLE];
     if (fundName != null) { res.push(fundName); }
     if (companyName != null) { /* TODO */ }
     return res;
@@ -117,7 +123,7 @@ const Dashboard = () => {
       }, {});
     }
 
-    return toChartData(res, selectedColumn?.dataPoint);
+    return toChartData(res, selectedColumn.dataPoint);
   }, [chartCompanies, filterPeriod, fund, selectedColumn, view]);
 
   /*
@@ -151,12 +157,12 @@ const Dashboard = () => {
       <HeaderBar
         crumbs={crumbs}
         view={view}
-        onCrumbClick={(idx) => { setSelectedColumn(null); navByIdx[idx](); }}
+        onCrumbClick={(idx) => { setSelectedColumn(DEFAULT_COLUMN); navByIdx[idx](); }}
         onSwitchChange={(e) => setChartCompanies(e.target.checked)}
       />
       <Chart
         chartData={chartData}
-        yLabel={selectedColumn?.title}
+        yLabel={selectedColumn.title}
       />
       <Filter
         options={FILTERS}
@@ -169,7 +175,7 @@ const Dashboard = () => {
         selectedColumn={selectedColumn}
         view={view}
         onColumnHeaderClick={(idx, title, dataPoint) => setSelectedColumn({ idx, title, dataPoint })}
-        onFundNameClick={(fundName) => { setSelectedColumn(null); goFund(fundName); }}
+        onFundNameClick={(fundName) => { setSelectedColumn(DEFAULT_COLUMN); goFund(fundName); }}
       />
     </StyledDashboard>
   );

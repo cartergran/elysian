@@ -1,10 +1,11 @@
 import {
   Link, // TODO
   TableBody,
+  TableCell,
   TableHead,
   TableRow
 } from '@mui/material';
-import { StyledHeaderCell, StyledBodyCell } from '../portfolio';
+import { StyledHeaderCell } from '../portfolio';
 import { useMemo } from 'react';
 
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
@@ -42,7 +43,7 @@ const FundView = ({
               <StyledHeaderCell
                 key={title}
                 $selectable={selectableColumnHeaders.includes(title)}
-                $selected={idx === selectedColumn?.idx}
+                $selected={idx === selectedColumn.idx}
                 onClick={() =>
                   selectableColumnHeaders.includes(title) &&
                   onColumnHeaderClick(idx, title, dataPoint)
@@ -68,9 +69,9 @@ const FundView = ({
               <TableRow key={companyName}>
                 {
                   cells.map((cell, idx) => (
-                    <StyledBodyCell key={idx} $selected={idx === selectedColumn?.idx}>
+                    <TableCell key={idx}>
                       {cell}
-                    </StyledBodyCell>
+                    </TableCell>
                   ))
                 }
               </TableRow>
