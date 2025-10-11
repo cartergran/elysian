@@ -45,7 +45,7 @@ const StyledUploadIcon = styled(CloudUploadIcon)`
   }
 `;
 
-const HeaderBar = ({ crumbs, view, onCrumbClick, onSwitchChange }) => {
+const Header = ({ crumbs, view, onCrumbClick, onSwitchChange }) => {
   return (
     <AppBar 
       position="static"
@@ -80,4 +80,4 @@ const HeaderBar = ({ crumbs, view, onCrumbClick, onSwitchChange }) => {
   );
 };
 
-export default HeaderBar;
+export default Header;

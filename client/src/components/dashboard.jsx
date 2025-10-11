@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import Chart from './chart';
 import Filter from './filter';
-import HeaderBar from './headerBar';
+import Header from './header';
 import Portfolio from './portfolio';
 
 import { slugify, deslugify } from '../utils/helpers';
@@ -154,7 +154,7 @@ const Dashboard = () => {
 
   return (
     <StyledDashboard>
-      <HeaderBar
+      <Header
         crumbs={crumbs}
         view={view}
         onCrumbClick={(idx) => { setSelectedColumn(DEFAULT_COLUMN); navByIdx[idx](); }}
