@@ -152,12 +152,19 @@ const Dashboard = () => {
     return res;
   }, [fund, view]);
 
+  const handleCrumbClick = (idx) => {
+    setChartCompanies(false);
+    setSelectedColumn(DEFAULT_COLUMN);
+    navByIdx[idx]();
+  };
+
   return (
     <StyledDashboard>
       <Header
+        chartCompanies={chartCompanies}
         crumbs={crumbs}
         view={view}
-        onCrumbClick={(idx) => { setSelectedColumn(DEFAULT_COLUMN); navByIdx[idx](); }}
+        onCrumbClick={handleCrumbClick}
         onSwitchChange={(e) => setChartCompanies(e.target.checked)}
       />
       <Chart
