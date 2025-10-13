@@ -58,7 +58,7 @@ const Upload = ({}) => {
   const handleClose = () => {
     setError(null);
     setFile(null);
-    setLoading(false);
+    // setLoading(false);
     setOpen(false);
     setResponse(null);
     if (fileInputRef.current) { fileInputRef.current.value = ''; }
@@ -89,10 +89,10 @@ const Upload = ({}) => {
     formData.append('file', file);
 
     try {
-      setLoading(true);
+      // setLoading(true);
       setError(null);
 
-      const res = await axios.post('extract', formData, {
+      const res = await axios.post('/api/extract', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -106,7 +106,7 @@ const Upload = ({}) => {
     } catch(err) {
       setError(err.response?.data?.detail || err.message || ERRORS.DEFAULT);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -163,7 +163,7 @@ const Upload = ({}) => {
             Cancel
           </Button>
           <Button
-            disabled={!file || loading}
+            disabled={!file || loading || response}
             startIcon={<CloudUploadIcon />}
             variant="contained"
             onClick={handleUpload}
