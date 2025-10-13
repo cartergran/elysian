@@ -1,8 +1,12 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const PORT = process.env.PORT || 3001;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -53,6 +57,7 @@ app.post('/api/extract', upload.single('file'), (req, res) => {
   }
 });
 
+// error handling
 app.use((err, _req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
@@ -62,6 +67,16 @@ app.use((err, _req, res, next) => {
   }
   next(err);
 });
+
+if (process.env.NODE_ENV === 'production') {
+  // serve static react files
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+
+  // catch all handler
+  app.get('/*splat', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

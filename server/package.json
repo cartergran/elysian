@@ -1,15 +1,13 @@
 {
   "name": "server",
   "version": "0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "type": "module",
   "dependencies": {
     "express": "^5.1.0",
     "multer": "^2.0.2"
