@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {
-  // Box,
   Button,
   CircularProgress,
   Dialog,
@@ -8,8 +7,11 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  FormControl,
+  FormHelperText,
   LinearProgress,
   Stack,
+  TextField,
   Typography
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -44,57 +46,101 @@ const StyledUploadIcon = styled(CloudUploadIcon)`
 
 const ERRORS = {
   DEFAULT: 'An error occurred while processing the file.',
-  NO_FILE: 'Please select a PDF file first.',
-  TOO_LARGE: 'File size must be less than 32MB'
+  FILE: {
+    EMPTY: 'A PDF file is required.',
+    TOO_LARGE: 'File size must be less than 32MB.'
+  },
+  FUND_NAME: {
+    EMPTY: 'A fund name is required.'
+  }
 };
 
-const MAX_BYTES = 32 * 1024 * 1024; // 32MB
+const FILE_MAX_BYTES = 32 * 1024 * 1024; // 32MB
+const FILE_HELPER_TEXT_ID = 'file-helper-text';
 
-const Upload = ({}) => {
-  const [error, setError] = useState(null);
-  const [file, setFile] = useState(null);
+const FORM_ID = 'upload-report-form';
+
+const FUND_NAME_LABEL = 'Fund Name';
+const FUND_NAME_MAX_LENGTH = 100;
+const FUND_NAME_PLACEHOLDER = 'Enter fund name...';
+
+const Upload = ({ fundName: initialFundName }) => {
+  // display state
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+
+  // input state
+  const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState(null);
+  const [fundName, setFundName] = useState(initialFundName ?? '');
+  const [fundNameError, setFundNameError] = useState(null);
+
+  // server state
+  const [globalError, setGlobalError] = useState(null);
   const [response, setResponse] = useState(null);
 
   const fileInputRef = useRef(null);
 
+  const isSubmitDisabled = loading || !file || !fundName || !!response;
+
+  const validateFundName = (n) => {
+    if (initialFundName) {
+      return null;
+    }
+
+    if (!n) {
+      return ERRORS.FUND_NAME.EMPTY;
+    }
+
+    // TODO:
+    // if (fundNames.includes(n)) {
+    //   return ERRORS.FUND_NAME.ALREADY_EXISTS;
+    // }
+
+    return null;
+  };
+
+  const validateFile = (f) => {
+    if (!f) {
+      return ERRORS.FILE.EMPTY;
+    }
+
+    if (f.size > FILE_MAX_BYTES) {
+      return ERRORS.FILE.TOO_LARGE;
+    }
+
+    return null;
+  };
+
   const handleClose = () => {
-    setError(null);
-    setFile(null);
     setLoading(false);
     setOpen(false);
-    setResponse(null);
+
+    setFile(null);
+    setFileError(null);
     if (fileInputRef.current) { fileInputRef.current.value = ''; }
+    setFundNameError(null);
+
+    setGlobalError(null);
+    setResponse(null);
   };
 
   const handleFileChange = (e) => {
-    const selected = e.target.files[0];
-    setResponse(null);
-
-    if (selected.size && selected.size > MAX_BYTES) {
-      setError(ERRORS.TOO_LARGE);
-      setFile(null);
-      if (fileInputRef.current) { fileInputRef.current.value = ''; }
-      return;
-    }
-
+    const selected = e.target.files[0] ?? null;
     setFile(selected);
-    setError(null);
+    setFileError(null);
+
+    setGlobalError(null);
+    setResponse(null);
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      setError(ERRORS.NO_FILE);
-      return;
-    }
-
     const formData = new FormData();
     formData.append('file', file);
 
     try {
       setLoading(true);
-      setError(null);
+      setGlobalError(null);
 
       const res = await axios.post('/api/extract', formData, {
         headers: {
@@ -108,10 +154,24 @@ const Upload = ({}) => {
       // onUploadSuccess();
 
     } catch(err) {
-      setError(err.response?.data?.detail || err.message || ERRORS.DEFAULT);
+      setGlobalError(err.response?.data?.detail || err.message || ERRORS.DEFAULT);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const fErr = validateFile(file);
+    const nErr = validateFundName(fundName);
+
+    setFileError(fErr);
+    setFundNameError(nErr);
+
+    if (fErr || nErr) { return; }
+
+    handleUpload();
   };
 
   return (
@@ -129,37 +189,61 @@ const Upload = ({}) => {
         </DialogTitle>
 
         <DialogContent dividers>
-          <Stack alignItems="center" spacing={1}>
-            <Button
-              aria-label="select"
-              component="label"
-              tabIndex={-1}
-              variant="contained"
-            >
-              Select Report
-              <input
-                accept="application/pdf"
-                hidden
-                ref={fileInputRef}
-                type="file"
-                onChange={handleFileChange}
+          <form id={FORM_ID} noValidate onSubmit={handleSubmit}>
+            <Stack alignItems="center" spacing={2}>
+              <TextField
+                aria-label="name"
+                error={!!fundNameError}
+                helperText={fundNameError || ''}
+                label={FUND_NAME_LABEL}
+                placeholder={FUND_NAME_PLACEHOLDER}
+                value={fundName}
+                variant="outlined"
+                onChange={(e) => setFundName(e.target.value)}
+                slotProps={{
+                  htmlInput: { maxLength: FUND_NAME_MAX_LENGTH },
+                  input: { readOnly: !!initialFundName }
+                }}
               />
-            </Button>
+              <FormControl error={!!fileError} required>
+                <Button
+                  aria-label="select"
+                  component="label"
+                  tabIndex={-1}
+                  variant="contained"
+                >
+                  Select Report
+                  <input
+                    accept="application/pdf"
+                    aria-describedby={fileError ? FILE_HELPER_TEXT_ID : ''}
+                    hidden
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={handleFileChange}
+                  />
+                </Button>
+                { <FormHelperText id={FILE_HELPER_TEXT_ID}>{fileError || ''}</FormHelperText> }
+              </FormControl>
 
-            { file && <Typography variant="body2">{file.name}</Typography> }
+              {/* TODO: transition  */}
+              { file && <Typography variant="body2">{file.name}</Typography> }
 
-            { loading && <StyledLinearProgress /> }
+              {/* TODO: transition  */}
+              { loading && <StyledLinearProgress /> }
 
-            {
-              // response && (
-              //   <Box>
-              //     <Typograpy></Typography>
-              //   </Box>
-              // )
-            }
+              {/* TODO: transition  */}
+              {
+                // response && (
+                //   <Box>
+                //     <Typograpy></Typography>
+                //   </Box>
+                // )
+              }
 
-            { error && <Typography color="error" variant="body2">{error}</Typography> }
-          </Stack>
+              {/* TODO: transition  */}
+              { globalError && <Typography color="error" variant="body2">{globalError}</Typography> }
+            </Stack>
+          </form>
         </DialogContent>
 
         <DialogActions>
@@ -167,10 +251,11 @@ const Upload = ({}) => {
             Cancel
           </Button>
           <Button
-            disabled={!file || loading || response}
-            startIcon={<CloudUploadIcon />}
+            disabled={isSubmitDisabled}
+            form={FORM_ID}
+            type="submit"
             variant="contained"
-            onClick={handleUpload}
+            startIcon={<CloudUploadIcon />}
           >
             { loading ? <CircularProgress size={24} /> : 'Upload' }
           </Button>
