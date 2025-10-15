@@ -24,6 +24,10 @@ const StyledCloseIconButton = styled(CloseIcon)`
   top: ${({ theme }) => theme.spacing(1)};
 `;
 
+const StyledLinearProgress = styled(LinearProgress)`
+  width: 50%;
+`;
+
 const StyledUploadIcon = styled(CloudUploadIcon)`
   font-size: 1.5rem;
   transition: transform 1s ease;
@@ -58,7 +62,7 @@ const Upload = ({}) => {
   const handleClose = () => {
     setError(null);
     setFile(null);
-    // setLoading(false);
+    setLoading(false);
     setOpen(false);
     setResponse(null);
     if (fileInputRef.current) { fileInputRef.current.value = ''; }
@@ -89,7 +93,7 @@ const Upload = ({}) => {
     formData.append('file', file);
 
     try {
-      // setLoading(true);
+      setLoading(true);
       setError(null);
 
       const res = await axios.post('/api/extract', formData, {
@@ -106,7 +110,7 @@ const Upload = ({}) => {
     } catch(err) {
       setError(err.response?.data?.detail || err.message || ERRORS.DEFAULT);
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -144,7 +148,7 @@ const Upload = ({}) => {
 
             { file && <Typography variant="body2">{file.name}</Typography> }
 
-            { loading && <LinearProgress /> }
+            { loading && <StyledLinearProgress /> }
 
             {
               // response && (

@@ -1,3 +1,4 @@
+import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 import express from 'express';
 import { fileURLToPath } from 'url';
@@ -6,12 +7,50 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import multer from 'multer';
 import path from 'path';
 
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
+const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+const EXTRACTION_PROMPT = process.env.EXTRACTION_PROMPT || 'Return an empty array [] as plain text.';
 const PORT = process.env.PORT || 3001;
 const S3_BUCKET = process.env.S3_BUCKET || '';
 
+const OUTPUT_SCHEMA = {
+  additionalProperties: false,
+  type: 'object',
+  properties: {
+    investments: {
+      additionalProperties: false,
+      type: 'array',
+      items: {
+        additionalProperties: false,
+        type: 'object',
+        properties: {
+          companyName: { type: 'string' },
+          investmentRound: {
+            type: 'object',
+            properties: {
+              investmentDate: { type: 'string' },
+              period: { type: 'string' },
+              investedCapital: { type: ['number', 'null'] },
+              realizedValue: { type: ['number', 'null'] },
+              unrealizedValue: { type: ['number', 'null'] },
+              totalValue: { type: ['number', 'null'] },
+              grossIRR: { type: ['number', 'null'] }
+            },
+            required: ['investmentDate', 'period', 'investedCapital', 'totalValue']
+          }
+        },
+        required: ['companyName', 'investmentRound']
+      }
+    }
+  },
+  required: ['investments']
+};
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
 
 const app = express();
 
@@ -48,6 +87,56 @@ const putPdfAndGetUrlFromS3 = async (buffer, filename) => {
   return signedUrl;
 };
 
+const parseAnthropicResponse = (res) => {
+  const toolOutput = res.content.find(obj => obj.type === 'tool_use');
+  if (toolOutput) {
+    return toolOutput.input.investments;
+  }
+
+  const textOutput = res.content.find(obj => obj.type === 'text');
+  if (textOutput) {
+    console.log('Model returned text: ', textOutput.text);
+  }
+
+  return [];
+};
+
+const callAndParseAnthropic = async (signedUrl) => {
+  const res = await anthropic.messages.create({
+    max_tokens: 8000,
+    model: ANTHROPIC_MODEL,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'document',
+            source: {
+              type: 'url',
+              url: signedUrl
+            }
+          },
+          {
+            type: 'text',
+            text: EXTRACTION_PROMPT
+          }
+        ]
+      }
+    ],
+    tools: [
+      {
+        description: 'Extract a financial table from a PDF and return a JSON matching the schema.',
+        input_schema: OUTPUT_SCHEMA,
+        name: 'extract_financial_table',
+      }
+    ],
+  });
+
+  const investments = parseAnthropicResponse(res);
+
+  return investments;
+};
+
 app.post('/api/extract', upload.single('file'), async (req, res) => {
   try {
     const file = req.file;
@@ -62,6 +151,7 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
     console.log('filename:', filename);
 
     const signedUrl = await putPdfAndGetUrlFromS3(req.file.buffer, filename);
+    const investments = await callAndParseAnthropic(signedUrl);
 
     /*
     const fileBuffer = req.file.buffer;
@@ -77,6 +167,7 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
 
     res.json({
       filename,
+      investments,
       message: 'PDF processed successfully',
       size: file.size,
       signedUrl
