@@ -48,15 +48,17 @@ const ERRORS = {
   DEFAULT: 'An error occurred while processing the file.',
   FILE: {
     EMPTY: 'A PDF file is required.',
-    TOO_LARGE: 'File size must be less than 32MB.'
+    TOO_LARGE: 'File size must be less than 32MB.',
+    WRONG_TYPE: 'File type must be a PDF.'
   },
   FUND_NAME: {
     EMPTY: 'A fund name is required.'
   }
 };
 
+const FILE_ACCEPTED_TYPE = 'application/pdf';
 const FILE_MAX_BYTES = 32 * 1024 * 1024; // 32MB
-const FILE_HELPER_TEXT_ID = 'file-helper-text';
+const FILE_HELPER_TXT_ID = 'file-helper-text';
 
 const FORM_ID = 'upload-report-form';
 
@@ -74,6 +76,7 @@ const Upload = ({ fundName: initialFundName }) => {
   const [fileError, setFileError] = useState(null);
   const [fundName, setFundName] = useState(initialFundName ?? '');
   const [fundNameError, setFundNameError] = useState(null);
+  const [fundNameTouched, setFundNameTouched] = useState(false);
 
   // server state
   const [globalError, setGlobalError] = useState(null);
@@ -109,6 +112,10 @@ const Upload = ({ fundName: initialFundName }) => {
       return ERRORS.FILE.TOO_LARGE;
     }
 
+    if (f.type !== FILE_ACCEPTED_TYPE) {
+      return ERRORS.FILE.WRONG_TYPE;
+    }
+
     return null;
   };
 
@@ -120,18 +127,32 @@ const Upload = ({ fundName: initialFundName }) => {
     setFileError(null);
     if (fileInputRef.current) { fileInputRef.current.value = ''; }
     setFundNameError(null);
+    setFundNameTouched(false);
 
     setGlobalError(null);
     setResponse(null);
   };
 
   const handleFileChange = (e) => {
-    const selected = e.target.files[0] ?? null;
-    setFile(selected);
-    setFileError(null);
+    const f = e.target.files[0] ?? null;
+    setFile(f);
+    setFileError(validateFile(f));
 
     setGlobalError(null);
     setResponse(null);
+  };
+
+  const handleFundNameChange = (e) => {
+    const n = e.target.value;
+    setFundName(n);
+    if (fundNameTouched) { setFundNameError(validateFundName(n)); }
+  };
+
+  const handleFundNameBlur = (_e) => {
+    const n = fundName.trim();
+    setFundName(n);
+    setFundNameError(validateFundName(n));
+    if (!fundNameTouched) { setFundNameTouched(true); }
   };
 
   const handleUpload = async () => {
@@ -163,8 +184,11 @@ const Upload = ({ fundName: initialFundName }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const n = fundName.trim();
+    setFundName(n);
+
     const fErr = validateFile(file);
-    const nErr = validateFundName(fundName);
+    const nErr = validateFundName(n);
 
     setFileError(fErr);
     setFundNameError(nErr);
@@ -199,7 +223,8 @@ const Upload = ({ fundName: initialFundName }) => {
                 placeholder={FUND_NAME_PLACEHOLDER}
                 value={fundName}
                 variant="outlined"
-                onChange={(e) => setFundName(e.target.value)}
+                onBlur={handleFundNameBlur}
+                onChange={handleFundNameChange}
                 slotProps={{
                   htmlInput: { maxLength: FUND_NAME_MAX_LENGTH },
                   input: { readOnly: !!initialFundName }
@@ -214,15 +239,15 @@ const Upload = ({ fundName: initialFundName }) => {
                 >
                   Select Report
                   <input
-                    accept="application/pdf"
-                    aria-describedby={fileError ? FILE_HELPER_TEXT_ID : ''}
+                    accept={FILE_ACCEPTED_TYPE}
+                    aria-describedby={fileError ? FILE_HELPER_TXT_ID : undefined}
                     hidden
                     ref={fileInputRef}
                     type="file"
                     onChange={handleFileChange}
                   />
                 </Button>
-                { <FormHelperText id={FILE_HELPER_TEXT_ID}>{fileError || ''}</FormHelperText> }
+                { fileError && <FormHelperText id={FILE_HELPER_TXT_ID}>{fileError}</FormHelperText> }
               </FormControl>
 
               {/* TODO: transition  */}
