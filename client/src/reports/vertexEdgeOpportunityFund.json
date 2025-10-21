@@ -1,11 +1,8 @@
 {
   "fundName": "Vertex Edge Opportunity Fund I",
-  "fundManager": "Vertex Edge Capital",
-  "inceptionDate": "2023-01-01",
   "investments": [
     {
       "companyName": "NeuroVista Therapeutics",
-      "sector": "Neurotechnology",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -83,7 +80,6 @@
     },
     {
       "companyName": "EcoForge Materials",
-      "sector": "Sustainable Manufacturing",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -161,7 +157,6 @@
     },
     {
       "companyName": "StratosLink",
-      "sector": "Satellite Communications",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -239,7 +234,6 @@
     },
     {
       "companyName": "FinSight AI",
-      "sector": "Financial Analytics",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -317,7 +311,6 @@
     },
     {
       "companyName": "HydroBloom",
-      "sector": "Hydroponics",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -395,7 +388,6 @@
     },
     {
       "companyName": "NanoFleet Systems",
-      "sector": "Nano Robotics",
       "investmentRounds": [
         {
           "period": "2023-Q1",

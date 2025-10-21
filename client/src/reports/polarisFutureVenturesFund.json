@@ -1,11 +1,8 @@
 {
   "fundName": "Polaris Future Ventures Fund I",
-  "fundManager": "Polaris Capital",
-  "inceptionDate": "2023-01-01",
   "investments": [
     {
       "companyName": "Ardent Bioworks",
-      "sector": "Life Sciences",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -83,7 +80,6 @@
     },
     {
       "companyName": "SkySynth Aero",
-      "sector": "Aerospace Technology",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -161,7 +157,6 @@
     },
     {
       "companyName": "TerraGrid Systems",
-      "sector": "Green Infrastructure",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -239,7 +234,6 @@
     },
     {
       "companyName": "Cognivault",
-      "sector": "Data Security",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -317,7 +311,6 @@
     },
     {
       "companyName": "LuminoTech",
-      "sector": "Optical Computing",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -395,7 +388,6 @@
     },
     {
       "companyName": "HarvestIQ",
-      "sector": "AgriTech AI",
       "investmentRounds": [
         {
           "period": "2023-Q1",

@@ -1,11 +1,8 @@
 {
   "fundName": "NexaCore Growth Equity Fund I",
-  "fundManager": "NexaCore Capital",
-  "inceptionDate": "2023-01-01",
   "investments": [
     {
       "companyName": "GeneFlux Labs",
-      "sector": "Biotech",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -83,7 +80,6 @@
     },
     {
       "companyName": "UrbanBeam",
-      "sector": "Smart Infrastructure",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -161,7 +157,6 @@
     },
     {
       "companyName": "Ecliptic Robotics",
-      "sector": "Automation",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -239,7 +234,6 @@
     },
     {
       "companyName": "AgriPulse",
-      "sector": "Precision Agriculture",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -317,7 +311,6 @@
     },
     {
       "companyName": "QuantaLynx",
-      "sector": "Quantum Computing",
       "investmentRounds": [
         {
           "period": "2023-Q1",
@@ -395,7 +388,6 @@
     },
     {
       "companyName": "MobiusChain",
-      "sector": "Blockchain Logistics",
       "investmentRounds": [
         {
           "period": "2023-Q1",
