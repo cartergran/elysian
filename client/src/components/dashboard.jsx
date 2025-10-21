@@ -25,6 +25,14 @@ const StyledDashboard = styled.div`
   padding: ${({ theme }) => theme.spacing(4)};
 `;
 
+const DEFAULT_COLUMN = {
+  idx: 1,
+  title: 'Total Value',
+  dataPoint: 'totalValue'
+};
+
+const HOME_TITLE = 'Financial Overview';
+
 const FILTERS = [
   { label: '1Q', period: 1 },
   { label: '2Q', period: 2 },
@@ -40,14 +48,6 @@ const FUNDS = [
   fundC
 ];
 const FUNDS_BY_NAME = FUNDS.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {});
-
-const HOME_TITLE = 'Financial Overview';
-
-const DEFAULT_COLUMN = {
-  idx: 1,
-  title: 'Total Value',
-  dataPoint: 'totalValue'
-};
 
 const Dashboard = () => {
   const nav = useNavigate();
