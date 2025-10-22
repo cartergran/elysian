@@ -7,17 +7,22 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import multer from 'multer';
 import path from 'path';
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
+import { requireEnvVariable } from './utils.js';
+import upsertFund from './upsert.js';
+
+const ANTHROPIC_API_KEY = requireEnvVariable('ANTHROPIC_API_KEY');
+const S3_BUCKET = requireEnvVariable('S3_BUCKET');
+
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
 const EXTRACTION_PROMPT = process.env.EXTRACTION_PROMPT || 'Return an empty array [] as plain text.';
 const PORT = process.env.PORT || 3001;
-const S3_BUCKET = process.env.S3_BUCKET || '';
 
 const OUTPUT_SCHEMA = {
   additionalProperties: false,
   type: 'object',
   properties: {
+    period: { type: 'string' },
     investments: {
       additionalProperties: false,
       type: 'array',
@@ -29,22 +34,20 @@ const OUTPUT_SCHEMA = {
           investmentRound: {
             type: 'object',
             properties: {
-              investmentDate: { type: 'string' },
-              period: { type: 'string' },
               investedCapital: { type: ['number', 'null'] },
               realizedValue: { type: ['number', 'null'] },
               unrealizedValue: { type: ['number', 'null'] },
               totalValue: { type: ['number', 'null'] },
               grossIRR: { type: ['number', 'null'] }
             },
-            required: ['investmentDate', 'period', 'investedCapital', 'totalValue']
+            required: ['investedCapital', 'totalValue']
           }
         },
         required: ['companyName', 'investmentRound']
       }
     }
   },
-  required: ['investments']
+  required: ['period', 'investments']
 };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -57,10 +60,10 @@ const app = express();
 const s3 = new S3Client({ region: AWS_REGION });
 
 const upload = multer({
-  storage: multer.memoryStorage(),
   limits: {
     fileSize: 32 * 1024 * 1024 // 32MB
   },
+  storage: multer.memoryStorage(),
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (ext !== '.pdf') {
@@ -90,7 +93,7 @@ const putPdfAndGetUrlFromS3 = async (buffer, filename) => {
 const parseAnthropicResponse = (res) => {
   const toolOutput = res.content.find(obj => obj.type === 'tool_use');
   if (toolOutput) {
-    return toolOutput.input.investments;
+    return toolOutput.input;
   }
 
   const textOutput = res.content.find(obj => obj.type === 'text');
@@ -132,16 +135,18 @@ const callAndParseAnthropic = async (signedUrl) => {
     ],
   });
 
-  const investments = parseAnthropicResponse(res);
-
-  return investments;
+  return parseAnthropicResponse(res);
 };
 
 app.post('/api/extract', upload.single('file'), async (req, res) => {
   try {
     const file = req.file;
+    const fundName = req.body.fundName;
     if (!file) {
       return res.status(400).json({ detail: 'No file uploaded.' });
+    }
+    if (!fundName) {
+      return res.status(400).json({ detail: 'No fund name entered.'})
     }
     if (!S3_BUCKET) {
       return res.status(500).json({ detail: 'S3 bucket not configured.' });
@@ -151,7 +156,14 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
     console.log('filename:', filename);
 
     const signedUrl = await putPdfAndGetUrlFromS3(req.file.buffer, filename);
-    const investments = await callAndParseAnthropic(signedUrl);
+    const { period, investments } = await callAndParseAnthropic(signedUrl);
+    const payload = {
+      fundName,
+      period,
+      investments,
+    };
+    // console.log('payload:', payload);
+    await upsertFund(payload);
 
     /*
     const fileBuffer = req.file.buffer;
@@ -167,10 +179,9 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
 
     res.json({
       filename,
-      investments,
       message: 'PDF processed successfully',
-      size: file.size,
-      signedUrl
+      payload,
+      size: file.size
     });
 
   } catch (err) {

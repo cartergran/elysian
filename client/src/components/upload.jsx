@@ -158,6 +158,7 @@ const Upload = ({ fundName: initialFundName }) => {
   const handleUpload = async () => {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('fundName', fundName.trim());
 
     try {
       setLoading(true);
