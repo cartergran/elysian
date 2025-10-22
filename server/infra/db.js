@@ -2,7 +2,7 @@ import fs from 'fs';
 import mysql from 'mysql2/promise';
 import path from 'path';
 
-import { requireEnvVariable } from './utils.js';
+import { requireEnvVariable } from '../utils.js';
 
 const DB_NAME = requireEnvVariable('DB_NAME');
 const DB_HOST = requireEnvVariable('DB_HOST');

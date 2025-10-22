@@ -1,63 +1,19 @@
-import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 import express from 'express';
 import { fileURLToPath } from 'url';
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import multer from 'multer';
 import path from 'path';
 
-import { requireEnvVariable } from './utils.js';
-import upsertFund from './upsert.js';
+import callAndParseAnthropic from './services/model.js';
+import putPdfAndGetUrlFromS3 from './services/bucket.js';
+import upsertFund from './services/upsert.js';
 
-const ANTHROPIC_API_KEY = requireEnvVariable('ANTHROPIC_API_KEY');
-const S3_BUCKET = requireEnvVariable('S3_BUCKET');
-
-const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
-const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
-const EXTRACTION_PROMPT = process.env.EXTRACTION_PROMPT || 'Return an empty array [] as plain text.';
 const PORT = process.env.PORT || 3001;
-
-const OUTPUT_SCHEMA = {
-  additionalProperties: false,
-  type: 'object',
-  properties: {
-    period: { type: 'string' },
-    investments: {
-      additionalProperties: false,
-      type: 'array',
-      items: {
-        additionalProperties: false,
-        type: 'object',
-        properties: {
-          companyName: { type: 'string' },
-          investmentRound: {
-            type: 'object',
-            properties: {
-              investedCapital: { type: ['number', 'null'] },
-              realizedValue: { type: ['number', 'null'] },
-              unrealizedValue: { type: ['number', 'null'] },
-              totalValue: { type: ['number', 'null'] },
-              grossIRR: { type: ['number', 'null'] }
-            },
-            required: ['investedCapital', 'totalValue']
-          }
-        },
-        required: ['companyName', 'investmentRound']
-      }
-    }
-  },
-  required: ['period', 'investments']
-};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
-
 const app = express();
-
-const s3 = new S3Client({ region: AWS_REGION });
 
 const upload = multer({
   limits: {
@@ -73,71 +29,6 @@ const upload = multer({
   }
 });
 
-const putPdfAndGetUrlFromS3 = async (buffer, filename) => {
-  const key = `reports/${filename}`;
-  const putCmd = new PutObjectCommand({
-    ACL: 'private',
-    Body: buffer,
-    Bucket: S3_BUCKET,
-    ContentType: 'application/pdf',
-    Key: key,
-  });
-  await s3.send(putCmd);
-
-  const getCmd = new GetObjectCommand({ Bucket: S3_BUCKET, Key: key });
-  const signedUrl = getSignedUrl(s3, getCmd, { expiresIn: 3600 });
-
-  return signedUrl;
-};
-
-const parseAnthropicResponse = (res) => {
-  const toolOutput = res.content.find(obj => obj.type === 'tool_use');
-  if (toolOutput) {
-    return toolOutput.input;
-  }
-
-  const textOutput = res.content.find(obj => obj.type === 'text');
-  if (textOutput) {
-    console.log('Model returned text: ', textOutput.text);
-  }
-
-  return [];
-};
-
-const callAndParseAnthropic = async (signedUrl) => {
-  const res = await anthropic.messages.create({
-    max_tokens: 8000,
-    model: ANTHROPIC_MODEL,
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'document',
-            source: {
-              type: 'url',
-              url: signedUrl
-            }
-          },
-          {
-            type: 'text',
-            text: EXTRACTION_PROMPT
-          }
-        ]
-      }
-    ],
-    tools: [
-      {
-        description: 'Extract a financial table from a PDF and return a JSON matching the schema.',
-        input_schema: OUTPUT_SCHEMA,
-        name: 'extract_financial_table',
-      }
-    ],
-  });
-
-  return parseAnthropicResponse(res);
-};
-
 app.post('/api/extract', upload.single('file'), async (req, res) => {
   try {
     const file = req.file;
@@ -147,9 +38,6 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
     }
     if (!fundName) {
       return res.status(400).json({ detail: 'No fund name entered.'})
-    }
-    if (!S3_BUCKET) {
-      return res.status(500).json({ detail: 'S3 bucket not configured.' });
     }
 
     const filename = req.file.originalname;
