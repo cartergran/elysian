@@ -61,7 +61,7 @@ const upsertFund = async (payload) => {
         iRow.realizedValue ?? 0,
         iRow.unrealizedValue ?? 0,
         iRow.totalValue ?? 0,
-        iRow.grossIRR // can be null
+        iRow.grossIrr // can be null
       ]);
     }
 

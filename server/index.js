@@ -5,6 +5,7 @@ import multer from 'multer';
 import path from 'path';
 
 import callAndParseAnthropic from './services/model.js';
+import getFunds from './services/query.js';
 import putPdfAndGetUrlFromS3 from './services/bucket.js';
 import upsertFund from './services/upsert.js';
 
@@ -66,14 +67,23 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
     */
 
     res.json({
-      filename,
-      message: 'PDF processed successfully',
-      payload,
+      message: 'Report processed successfully',
       size: file.size
     });
 
   } catch (err) {
     const errDetail = `Error processing file: ${err.message}`;
+    console.error(errDetail);
+    return res.status(500).json({ detail: errDetail });
+  }
+});
+
+app.get('/api/funds', async (req, res) => {
+  try {
+    const funds = await getFunds();
+    res.json(funds);
+  } catch(err) {
+    const errDetail = `Error fetching funds: ${err.message}`;
     console.error(errDetail);
     return res.status(500).json({ detail: errDetail });
   }

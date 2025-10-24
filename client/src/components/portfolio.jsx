@@ -30,7 +30,6 @@ const COLUMN_HEADERS_BY_DATA_POINT = {
     investedCapital: 'Invested Capital',
     realizedValue: 'Realized Value',
     unrealizedValue: 'Unrealized Value',
-    grossIRR: 'Gross IRR',
     returnPercent: 'Return'
   },
   FUND: {

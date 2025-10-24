@@ -28,7 +28,7 @@ const OUTPUT_SCHEMA = {
               realizedValue: { type: ['number', 'null'] },
               unrealizedValue: { type: ['number', 'null'] },
               totalValue: { type: ['number', 'null'] },
-              grossIRR: { type: ['number', 'null'] }
+              grossIrr: { type: ['number', 'null'] }
             },
             required: ['investedCapital', 'totalValue']
           }

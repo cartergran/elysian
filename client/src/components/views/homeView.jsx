@@ -33,7 +33,6 @@ const HomeView = ({
       investedCapital: currentInvestment.investedCapital,
       realizedValue: currentInvestment.realizedValue,
       unrealizedValue: currentInvestment.unrealizedValue,
-      grossIRR: currentInvestment.grossIRR,
       returnPercent
     };
   }), [portfolioData, filterPeriod]);
@@ -67,7 +66,6 @@ const HomeView = ({
             investedCapital,
             realizedValue,
             unrealizedValue,
-            grossIRR,
             returnPercent
         }) => {
             let cells = [
@@ -78,7 +76,6 @@ const HomeView = ({
               formatCurrency(investedCapital),
               formatCurrency(realizedValue),
               formatCurrency(unrealizedValue),
-              `${grossIRR}%`,
               `${returnPercent}%`
             ];
 

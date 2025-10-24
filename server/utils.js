@@ -1,9 +1,5 @@
-const requireEnvVariable = (name) => {
-  const variable = process.env[name];
-  if (!variable) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return variable;
+const n = (v) => {
+  return Math.round((Number(v) + Number.EPSILON) * 10) / 10;
 };
 
 const getInvestmentRoundSummary = (payload) => {
@@ -22,13 +18,22 @@ const getInvestmentRoundSummary = (payload) => {
   });
 
   for (const key of Object.keys(investmentRoundSummary)) {
-    investmentRoundSummary[key] = Math.round(investmentRoundSummary[key] * 10) / 10;
+    investmentRoundSummary[key] = n(investmentRoundSummary[key])
   }
 
   return investmentRoundSummary;
 };
 
+const requireEnvVariable = (name) => {
+  const variable = process.env[name];
+  if (!variable) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return variable;
+};
+
 export {
+  n,
   getInvestmentRoundSummary,
   requireEnvVariable
 };

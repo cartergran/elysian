@@ -9,10 +9,13 @@ import Portfolio from './portfolio';
 
 import { slugify, deslugify } from '../utils/helpers';
 import { toChartData } from '../utils/investments';
+import { useFunds } from '../hooks/funds';
 
-import fundA from '../reports/nexacoreGrowthEquityFund.json';
-import fundB from '../reports/polarisFutureVenturesFund.json';
-import fundC from '../reports/vertexEdgeOpportunityFund.json';
+// TODO: tmp
+// import fundA from '../reports/nexacoreGrowthEquityFund.json';
+// import fundB from '../reports/polarisFutureVenturesFund.json';
+// import fundC from '../reports/vertexEdgeOpportunityFund.json';
+// const funds = [fundA, fundB, fundC];
 
 const StyledDashboard = styled.div`
   display: flex;
@@ -42,30 +45,31 @@ const FILTERS = [
 ];
 const lastPeriod = (p, arr) => p === Infinity ? arr : arr.slice(-(p + 1));
 
-const FUNDS = [
-  fundA,
-  fundB,
-  fundC
-];
-const FUNDS_BY_NAME = FUNDS.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {});
-
 const Dashboard = () => {
-  const nav = useNavigate();
   const { fundSlug, companySlug } = useParams();
+  const nav = useNavigate();
+  // TODO: loading, isError, error
+  const { data: funds = [], isLoading: loading, isError, error } = useFunds();
+
   const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
   const [selectedColumn, setSelectedColumn] = useState(DEFAULT_COLUMN);
 
-  const fundName = fundSlug ? deslugify(fundSlug, FUNDS) : null;
+  const FUNDS_BY_NAME = useMemo(() => (
+    funds.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {})
+  ), [funds]);
+
+  const fundName = fundSlug ? deslugify(fundSlug, funds) : null;
   const fund = fundName ? FUNDS_BY_NAME[fundName] : null;
-  const companyName = companySlug && fund ? deslugify(companySlug, FUNDS, fund) : null;
+  const companyName = companySlug && fund ? deslugify(companySlug, funds, fund) : null;
 
   const crumbs = useMemo(() => {
-    let res = [HOME_TITLE];
-    if (fundName != null) { res.push(fundName); }
+    let retVal = [HOME_TITLE];
+    if (fundName != null) { retVal.push(fundName); }
     if (companyName != null) { /* TODO */ }
-    return res;
+    return retVal;
   }, [fundName, companyName]);
+
   const view = useMemo(() => {
     if (fundName && companyName) { return { mode: 'COMPANY', params: { fundName, companyName } }; }
     if (fundName) { return { mode: 'FUND', params: { fundName } } };
@@ -106,10 +110,10 @@ const Dashboard = () => {
     }
   */
   const chartData = useMemo(() => {
-    let res = {};
+    let retVal = {};
     if (view.mode === 'FUND') {
       // fund view
-      res = chartCompanies
+      retVal = chartCompanies
         ? fund.investments.reduce((acc, i) => {
             acc[i.companyName] = lastPeriod(filterPeriod, i.investmentRounds);
             return acc;
@@ -117,14 +121,14 @@ const Dashboard = () => {
         : { [fund.fundName]: lastPeriod(filterPeriod, fund.investmentRoundsSummary) };
     } else {
       // home view
-      res = FUNDS.reduce((acc, f) => {
+      retVal = funds.reduce((acc, f) => {
         acc[f.fundName] = lastPeriod(filterPeriod, f.investmentRoundsSummary);
         return acc;
       }, {});
     }
 
-    return toChartData(res, selectedColumn.dataPoint);
-  }, [chartCompanies, filterPeriod, fund, selectedColumn, view]);
+    return toChartData(retVal, selectedColumn.dataPoint);
+  }, [chartCompanies, filterPeriod, fund, funds, selectedColumn, view]);
 
   /*
     portfolioData := [
@@ -140,17 +144,18 @@ const Dashboard = () => {
     ]
   */
   const portfolioData = useMemo(() => {
-    let res = [];
+    let retVal = [];
     if (view.mode === 'FUND') {
-      res = fund.investments;
+      retVal = fund.investments;
     } else {
-      res = FUNDS.map(({ fundName, investmentRoundsSummary }) => ({
+      retVal = funds.map(({ fundName, investmentRoundsSummary }) => ({
         fundName,
         investmentRoundsSummary
       }));
     }
-    return res;
-  }, [fund, view]);
+
+    return retVal;
+  }, [fund, funds, view]);
 
   const handleCrumbClick = (idx) => {
     setChartCompanies(false);

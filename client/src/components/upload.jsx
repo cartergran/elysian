@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   Button,
   CircularProgress,
@@ -18,6 +17,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
+
+import { useUploadFund } from '../hooks/funds';
 
 const StyledCloseIconButton = styled(CloseIcon)`
   position: absolute;
@@ -67,8 +68,10 @@ const FUND_NAME_MAX_LENGTH = 100;
 const FUND_NAME_PLACEHOLDER = 'Enter fund name...';
 
 const Upload = ({ fundName: initialFundName }) => {
+  const fileInputRef = useRef(null);
+  const { isPending, mutateAsync } = useUploadFund();
+
   // display state
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
   // input state
@@ -82,9 +85,7 @@ const Upload = ({ fundName: initialFundName }) => {
   const [globalError, setGlobalError] = useState(null);
   const [response, setResponse] = useState(null);
 
-  const fileInputRef = useRef(null);
-
-  const isSubmitDisabled = loading || !file || !fundName || !!response;
+  const isSubmitDisabled = !file || !fundName || isPending || !!response;
 
   const validateFundName = (n) => {
     if (initialFundName) {
@@ -120,7 +121,6 @@ const Upload = ({ fundName: initialFundName }) => {
   };
 
   const handleClose = () => {
-    setLoading(false);
     setOpen(false);
 
     setFile(null);
@@ -161,24 +161,18 @@ const Upload = ({ fundName: initialFundName }) => {
     formData.append('fundName', fundName.trim());
 
     try {
-      setLoading(true);
       setGlobalError(null);
 
-      const res = await axios.post('/api/extract', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const res = await mutateAsync(formData);
+      setResponse(res);
 
-      setResponse(res.data);
       // setFile(null);
       // fileInputRef.current?.value = '';
       // onUploadSuccess();
 
     } catch(err) {
+      console.error(`${ERRORS.DEFAULT} ${err}`);
       setGlobalError(err.response?.data?.detail || err.message || ERRORS.DEFAULT);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -255,16 +249,10 @@ const Upload = ({ fundName: initialFundName }) => {
               { file && <Typography variant="body2">{file.name}</Typography> }
 
               {/* TODO: transition  */}
-              { loading && <StyledLinearProgress /> }
+              { isPending && <StyledLinearProgress /> }
 
               {/* TODO: transition  */}
-              {
-                // response && (
-                //   <Box>
-                //     <Typograpy></Typography>
-                //   </Box>
-                // )
-              }
+              { response && <Typography variant={"body2"}>{response.message}</Typography> }
 
               {/* TODO: transition  */}
               { globalError && <Typography color="error" variant="body2">{globalError}</Typography> }
@@ -273,7 +261,7 @@ const Upload = ({ fundName: initialFundName }) => {
         </DialogContent>
 
         <DialogActions>
-          <Button disabled={loading} variant="outlined" onClick={handleClose}>
+          <Button disabled={isPending} variant="outlined" onClick={handleClose}>
             Cancel
           </Button>
           <Button
@@ -283,7 +271,7 @@ const Upload = ({ fundName: initialFundName }) => {
             variant="contained"
             startIcon={<CloudUploadIcon />}
           >
-            { loading ? <CircularProgress size={24} /> : 'Upload' }
+            { isPending ? <CircularProgress size={24} /> : 'Upload' }
           </Button>
         </DialogActions>
       </Dialog>
