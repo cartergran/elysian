@@ -67,6 +67,7 @@ const getFunds = async () => {
     SELECT
       f.fund_id,
       f.fund_name,
+      c.company_id,
       c.company_name,
       ir.period_label,
       ir.period_year,

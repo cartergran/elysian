@@ -78,7 +78,7 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
   }
 });
 
-app.get('/api/funds', async (req, res) => {
+app.get('/api/funds', async (_req, res) => {
   try {
     const funds = await getFunds();
     res.json(funds);
