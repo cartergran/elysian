@@ -10,7 +10,7 @@ const putPdfAndGetUrlFromS3 = async (buffer, filename) => {
   if (!S3_BUCKET) {
     throw new Error('S3 bucket not configured.');
   }
-  
+
   const key = `reports/${filename}`;
   const putCmd = new PutObjectCommand({
     ACL: 'private',

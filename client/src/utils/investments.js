@@ -1,4 +1,3 @@
-// TODO: = (data, dataPoint = 'totalValue')
 const toChartData = (data, dataPoint = 'totalValue') => {
   let periodMap = new Map();
 
