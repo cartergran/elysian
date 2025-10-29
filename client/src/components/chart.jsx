@@ -23,7 +23,8 @@ const StyledLegendLabel = styled.span`
   display: inline-block;
 
   cursor: pointer;
-  opacity: ${({ $active, theme }) => ($active ? 1 : theme.chart.legendOpacityInactive)};
+  font-size: ${({ theme }) => theme.typography.body2.fontSize};
+  opacity: ${({ $active, theme }) => $active ? 1 : theme.chart.legend.opacityInactive};
   transition: opacity 0.25s ease;
   user-select: none;
 `;
@@ -71,12 +72,14 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
 
   const chartColors = theme.palette.chartLines || [];
   const { entityNames, dataPointsPerPeriod } = chartData;
+  const firstPeriod = dataPointsPerPeriod.at(0)?.period;
+  const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
   const periodTickFormatter = (val) => { let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}` };
   const toggleSelect = (dataKey) => setSelectedLine((prev) => prev === dataKey ? null : dataKey);
 
   const responsive = useMemo(() => {
     const height = isLargeViewport ? 500 : 400;
-    const tickFontSize = theme.typography.tick[isLargeViewport ? 'large' : 'small'].fontSize;
+    const tickFontSize = theme.typography[isLargeViewport ? 'body2' : 'caption'].fontSize;
 
     return {
       height,
@@ -102,6 +105,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
             fontSize: responsive.tickFontSize
           }}
           tickFormatter={periodTickFormatter}
+          {...(!isLargeViewport && { ticks: [firstPeriod, lastPeriod] })}
         />
         <YAxis
           stroke="white"
@@ -117,7 +121,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
             <Line
               key={entityName}
               activeDot=
-                {{ r: activeLine === entityName ? theme.chart.dotRActive : theme.chart.dotR }}
+                {{ r: activeLine === entityName ? theme.chart.dot.r : theme.chart.dot.rActive }}
               connectNulls
               dataKey={entityName}
               // TODO:
@@ -125,10 +129,10 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
               // isAnimationActive={!activeLine}
               name={entityName}
               opacity=
-                {(activeLine && activeLine !== entityName) ? theme.chart.lineOpacityInactive : 1}
+                {(activeLine && activeLine !== entityName) ? theme.chart.line.opacityInactive : 1}
               stroke={chartColors[i % chartColors.length]}
               strokeWidth=
-                {activeLine === entityName ? theme.chart.lineWidthActive : theme.chart.lineWidth}
+                {activeLine === entityName ? theme.chart.line.widthActive : theme.chart.line.width}
             />
           ))
         }
@@ -137,7 +141,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
             <Legend
               align="center"
               verticalAlign="top"
-              iconSize={8}
+              iconSize={4}
               iconType="circle"
               labelStyle={{ color: 'black' }}
               formatter={(entityName) =>

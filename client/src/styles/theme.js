@@ -32,12 +32,19 @@ const muiTheme = createTheme({
     ]
   },
   chart: {
-    dotR: 1,
-    dotRActive: 2,
-    legendOpacityInactive: 0.5,
-    lineWidth: 2,
-    lineWidthActive: 4,
-    lineOpacityInactive: 0.25
+    dot: {
+      r: 1,
+      rActive: 2
+    },
+    legend: {
+      fontSize: 14,
+      opacityInactive: 0.5
+    },
+    line: {
+      opacityInactive: 0.25,
+      width: 2,
+      widthActive: 4
+    }
   },
   shape: {
     borderWidth: 1,
@@ -45,11 +52,7 @@ const muiTheme = createTheme({
   },
   spacing: 8,
   typography: {
-    fontFamily: 'Roboto Mono, monospace',
-    tick: {
-      small: { fontSize: '0.75rem' },
-      large: { fontSize: '0.875rem' }
-    }
+    fontFamily: 'Roboto Mono, monospace'
   }
 });
 
