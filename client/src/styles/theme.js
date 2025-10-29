@@ -45,7 +45,7 @@ const muiTheme = createTheme({
   },
   spacing: 8,
   typography: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Roboto Mono, monospace',
     tick: {
       small: { fontSize: '0.75rem' },
       large: { fontSize: '0.875rem' }
