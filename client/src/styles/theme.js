@@ -34,7 +34,7 @@ const muiTheme = createTheme({
   chart: {
     dotR: 1,
     dotRActive: 2,
-    legendOpacityInactive: 0.75,
+    legendOpacityInactive: 0.5,
     lineWidth: 2,
     lineWidthActive: 4,
     lineOpacityInactive: 0.25

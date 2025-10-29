@@ -9,7 +9,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import { useMediaQuery } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 
 const StyledChart = styled(ResponsiveContainer)`
@@ -22,17 +22,11 @@ const StyledChart = styled(ResponsiveContainer)`
 const StyledLegendLabel = styled.span`
   display: inline-block;
 
+  cursor: pointer;
   opacity: ${({ $active, theme }) => ($active ? 1 : theme.chart.legendOpacityInactive)};
   transition: opacity 0.25s ease;
   user-select: none;
 `;
-const LegendWrapperStyle = (activeLine, legendOpacityInactive) => {
-  return {
-    cursor: 'pointer',
-    opacity: activeLine ? 1 : legendOpacityInactive,
-    transition: 'opacity 0.25s ease'
-  };
-};
 
 const StyledTooltip = styled.div`
   display: flex;
@@ -90,6 +84,13 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
     }
   }, [isLargeViewport, theme]);
 
+  // stable string key
+  const entityNamesKey = chartData.entityNames.join('|');
+  useEffect(() => {
+    setSelectedLine(null);
+    setHoverLine(null);
+  }, [entityNamesKey]);
+
   return (
     <StyledChart height={responsive.height}>
       <LineChart data={dataPointsPerPeriod}>
@@ -117,7 +118,11 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
               key={entityName}
               activeDot=
                 {{ r: activeLine === entityName ? theme.chart.dotRActive : theme.chart.dotR }}
+              connectNulls
               dataKey={entityName}
+              // TODO:
+              // animationDuration={3000}
+              // isAnimationActive={!activeLine}
               name={entityName}
               opacity=
                 {(activeLine && activeLine !== entityName) ? theme.chart.lineOpacityInactive : 1}
@@ -140,10 +145,9 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
                   {entityName}
                 </StyledLegendLabel>
               }
-              wrapperStyle={LegendWrapperStyle(activeLine, theme.chart.legendOpacityInactive)}
               onClick={(e) => toggleSelect(e.dataKey)}
               onMouseEnter={(e) => !selectedLine && setHoverLine(e.dataKey)}
-              onMouseLeave={() => !selectedLine && setHoverLine(null)}
+              onMouseLeave={() => hoverLine && setHoverLine(null)}
             />
         }
       </LineChart>
