@@ -34,8 +34,6 @@ const DEFAULT_COLUMN = {
   dataPoint: 'totalValue'
 };
 
-const HOME_TITLE = 'Financial Overview';
-
 const FILTERS = [
   { label: '1Q', period: 1 },
   { label: '2Q', period: 2 },
@@ -62,13 +60,6 @@ const Dashboard = () => {
   const fundName = fundSlug ? deslugify(fundSlug, funds) : null;
   const fund = fundName ? FUNDS_BY_NAME[fundName] : null;
   const companyName = companySlug && fund ? deslugify(companySlug, funds, fund) : null;
-
-  const crumbs = useMemo(() => {
-    let retVal = [HOME_TITLE];
-    if (fundName != null) { retVal.push(fundName); }
-    if (companyName != null) { /* TODO */ }
-    return retVal;
-  }, [fundName, companyName]);
 
   const view = useMemo(() => {
     if (fundName && companyName) { return { mode: 'COMPANY', params: { fundName, companyName } }; }
@@ -166,8 +157,7 @@ const Dashboard = () => {
   return (
     <StyledDashboard>
       <Header
-        chartCompanies={chartCompanies}
-        crumbs={crumbs}
+        fundName={fundName}
         view={view}
         onCrumbClick={handleCrumbClick}
         onSwitchChange={(e) => setChartCompanies(e.target.checked)}

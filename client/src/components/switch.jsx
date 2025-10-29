@@ -1,5 +1,5 @@
 import {
-  Box,
+  Stack,
   Switch as MUISwitch,
   Typography,
   useMediaQuery,
@@ -7,10 +7,7 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 
-const StyledSwitch = styled(Box)`
-  display: flex;
-  align-items: center;
-
+const StyledSwitch = styled(Stack)`
   & .MuiSwitch-root .MuiSwitch-track {
     background-color: ${({ theme }) => theme.palette.secondary.main};
   }
@@ -21,7 +18,7 @@ const Switch = ({ label, onChange }) => {
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
   return (
-    <StyledSwitch>
+    <StyledSwitch direction="row" alignItems="center">
       <MUISwitch
         color="secondary"
         size={isLargeViewport ? 'large' : 'small'}

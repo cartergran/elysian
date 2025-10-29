@@ -209,10 +209,11 @@ const Upload = ({ fundName: initialFundName }) => {
 
         <DialogContent dividers>
           <form id={FORM_ID} noValidate onSubmit={handleSubmit}>
-            <Stack alignItems="center" spacing={2}>
+            <Stack alignItems="center" gap={2}>
               <TextField
                 aria-label="name"
                 error={!!fundNameError}
+                fullWidth
                 helperText={fundNameError || ''}
                 label={FUND_NAME_LABEL}
                 placeholder={FUND_NAME_PLACEHOLDER}
@@ -229,7 +230,6 @@ const Upload = ({ fundName: initialFundName }) => {
                 <Button
                   aria-label="select"
                   component="label"
-                  tabIndex={-1}
                   variant="contained"
                 >
                   Select Report
