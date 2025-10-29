@@ -9,12 +9,12 @@ import styled from 'styled-components';
 
 export const StyledHeaderCell = styled(TableCell)`
   color:
-    ${({ $selected, theme }) => $selected
+    ${({ theme, $selected  }) => $selected
       ? theme.palette.primary.light
       : theme.palette.secondary.main
     };
   font-size:
-    ${({ $selected, theme }) => $selected
+    ${({ theme, $selected  }) => $selected
       ? theme.typography.subtitle1.fontSize
       : theme.typography.subtitle2.fontSize
     };

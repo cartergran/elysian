@@ -24,7 +24,7 @@ const StyledLegendLabel = styled.span`
 
   cursor: pointer;
   font-size: ${({ theme }) => theme.typography.body2.fontSize};
-  opacity: ${({ $active, theme }) => $active ? 1 : theme.chart.legend.opacityInactive};
+  opacity: ${({ theme, $active }) => $active ? 1 : theme.chart.legend.opacityInactive};
   transition: opacity 0.25s ease;
   user-select: none;
 `;

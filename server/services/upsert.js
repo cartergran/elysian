@@ -1,7 +1,7 @@
 import { getInvestmentRoundSummary } from '../utils.js';
 import pool from '../infra/db.js';
 
-/* Parse '2025-Q1' -> { year: 2025, quarter: 1 } */
+/* Parse '2025-Q1' ---> { year: 2025, quarter: 1 } */
 const parsePeriod = (p) => {
   const [y, q] = p.split('-Q');
   return { year: Number(y), quarter: Number(q) };
