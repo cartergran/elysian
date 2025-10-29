@@ -18,7 +18,7 @@ const muiTheme = createTheme({
       disabled: '#A0A0A0',
       highlighted: '#2A2A2A'
     },
-    charts: [
+    chartLines: [
       '#aec7e8',
       '#ffbb78',
       '#98df8a',
@@ -30,6 +30,14 @@ const muiTheme = createTheme({
       '#dbdb8d',
       '#9edae5'
     ]
+  },
+  chart: {
+    dotR: 1,
+    dotRActive: 2,
+    legendOpacityInactive: 0.75,
+    lineWidth: 2,
+    lineWidthActive: 4,
+    lineOpacityInactive: 0.25
   },
   shape: {
     borderWidth: 1,

@@ -174,7 +174,7 @@ const Dashboard = () => {
       />
       <Chart
         chartData={chartData}
-        yLabel={selectedColumn.title}
+        dataLabel={selectedColumn.title}
       />
       <Filter
         options={FILTERS}
