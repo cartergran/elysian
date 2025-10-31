@@ -47,32 +47,22 @@ const SELECTABLE_COLUMN_HEADERS = [
   'Unrealized Value'
 ];
 
-const views = {
+const viewRegistry = {
   HOME: HomeView,
   FUND: FundView
 };
 
-const Portfolio = ({
-  portfolioData,
-  filterPeriod,
-  selectedColumn,
-  view,
-  onColumnHeaderClick,
-  onFundNameClick
-}) => {
-  const ViewComponent = views[view.mode] || (() => null);
+const Portfolio = ({ model, view, controller }) => {
+  const ActiveView = viewRegistry[view.mode] || (() => null);
 
   return (
     <TableContainer>
       <Table>
-        <ViewComponent
+        <ActiveView
           columnHeadersByDataPoint={COLUMN_HEADERS_BY_DATA_POINT[view.mode]}
-          filterPeriod={filterPeriod}
-          portfolioData={portfolioData}
           selectableColumnHeaders={SELECTABLE_COLUMN_HEADERS}
-          selectedColumn={selectedColumn}
-          onColumnHeaderClick={onColumnHeaderClick}
-          onFundNameClick={onFundNameClick}
+          {...model}
+          {...controller}
         />
       </Table>
     </TableContainer>

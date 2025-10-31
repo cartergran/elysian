@@ -12,7 +12,8 @@ const muiTheme = createTheme({
       light: '#FED76D'
     },
     text: {
-      primary: '#FDB927'
+      primary: '#FED76D',
+      secondary: '#552583'
     },
     action: {
       disabled: '#A0A0A0',

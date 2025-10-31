@@ -1,5 +1,4 @@
 import {
-  Legend,
   LineChart,
   Line,
   ResponsiveContainer,
@@ -9,7 +8,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import { useMediaQuery } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
 const StyledChart = styled(ResponsiveContainer)`
@@ -17,16 +16,6 @@ const StyledChart = styled(ResponsiveContainer)`
   & svg:focus {
     outline: none;
   }
-`;
-
-const StyledLegendLabel = styled.span`
-  display: inline-block;
-
-  cursor: pointer;
-  font-size: ${({ theme }) => theme.typography.body2.fontSize};
-  opacity: ${({ theme, $active }) => $active ? 1 : theme.chart.legend.opacityInactive};
-  transition: opacity 0.25s ease;
-  user-select: none;
 `;
 
 const StyledTooltip = styled.div`
@@ -44,38 +33,35 @@ const StyledTooltip = styled.div`
   }
 `;
 
-const ActiveLineTooltip = ({ active, activeLine, dataLabel, payload }) => {
+/*
+TODO:
+const SelectedEntitiesTooltip = ({ active, selectedEntities, dataLabel, payload }) => {
   if (!active || !payload?.length) {
     return null;
   }
 
-  const entry = activeLine ? payload.find(p => p.dataKey === activeLine) : null;
-  if (!entry) {
+  const entries = selectedEntities ? payload.filter(...)
+  if (!entries) {
     return null;
   }
 
-  return (
-    <StyledTooltip>
-      <span className="data-label">{dataLabel}</span>
-      <span>{entry.dataKey}: {entry.value}</span>
-    </StyledTooltip>
-  );
-};
+  return (<div />);
+}
+*/;
 
-const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
+// i.e. dots & tooltip
+const MAX_COMPANIES_FOR_DETAILS = 5;
+
+const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
   const theme = useTheme();
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
-
-  const [hoverLine, setHoverLine] = useState(null);
-  const [selectedLine, setSelectedLine] = useState(null);
-  const activeLine = selectedLine ?? hoverLine;
 
   const chartColors = theme.palette.chartLines || [];
   const { entityNames, dataPointsPerPeriod } = chartData;
   const firstPeriod = dataPointsPerPeriod.at(0)?.period;
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
   const periodTickFormatter = (val) => { let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}` };
-  const toggleSelect = (dataKey) => setSelectedLine((prev) => prev === dataKey ? null : dataKey);
+  const showDots = selectedEntities.size <= MAX_COMPANIES_FOR_DETAILS;
 
   const responsive = useMemo(() => {
     const height = isLargeViewport ? 500 : 400;
@@ -86,13 +72,6 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
       tickFontSize
     }
   }, [isLargeViewport, theme]);
-
-  // stable string key
-  const entityNamesKey = chartData.entityNames.join('|');
-  useEffect(() => {
-    setSelectedLine(null);
-    setHoverLine(null);
-  }, [entityNamesKey]);
 
   return (
     <StyledChart height={responsive.height}>
@@ -115,44 +94,28 @@ const Chart = ({ chartData, dataLabel = 'Total Value' }) => {
           }}
           tickFormatter={(val) => `$${val}`}
         />
-        <Tooltip content={<ActiveLineTooltip activeLine={activeLine} dataLabel={dataLabel} />} />
+        <Tooltip
+          content={() => null}
+          isAnimationActive={false}
+          wrapperStyle={{ pointerEvents: 'none' }} // avoids browser hit-testing
+        />
         {
-          entityNames.map((entityName, i) => (
-            <Line
-              key={entityName}
-              activeDot=
-                {{ r: activeLine === entityName ? theme.chart.dot.r : theme.chart.dot.rActive }}
-              connectNulls
-              dataKey={entityName}
-              // TODO:
-              // animationDuration={3000}
-              // isAnimationActive={!activeLine}
-              name={entityName}
-              opacity=
-                {(activeLine && activeLine !== entityName) ? theme.chart.line.opacityInactive : 1}
-              stroke={chartColors[i % chartColors.length]}
-              strokeWidth=
-                {activeLine === entityName ? theme.chart.line.widthActive : theme.chart.line.width}
-            />
-          ))
-        }
-        {
-          isLargeViewport &&
-            <Legend
-              align="center"
-              verticalAlign="top"
-              iconSize={4}
-              iconType="circle"
-              labelStyle={{ color: 'black' }}
-              formatter={(entityName) =>
-                <StyledLegendLabel $active={activeLine === entityName}>
-                  {entityName}
-                </StyledLegendLabel>
-              }
-              onClick={(e) => toggleSelect(e.dataKey)}
-              onMouseEnter={(e) => !selectedLine && setHoverLine(e.dataKey)}
-              onMouseLeave={() => hoverLine && setHoverLine(null)}
-            />
+          entityNames.map((entityName, i) => {
+            const isSelected = selectedEntities.has(entityName);
+
+            return (
+              <Line
+                key={entityName}
+                activeDot={isSelected && showDots}
+                connectNulls
+                dataKey={entityName}
+                dot={isSelected && showDots}
+                name={entityName}
+                opacity={ isSelected ? 1 : theme.chart.line.opacityInactive }
+                stroke={chartColors[i % chartColors.length]}
+              />
+            );
+          })
         }
       </LineChart>
     </StyledChart>

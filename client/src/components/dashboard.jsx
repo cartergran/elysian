@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -12,9 +12,9 @@ import { toChartData } from '../utils/investments';
 import { useFunds } from '../hooks/funds';
 
 // TODO: tmp
-// import fundA from '../reports/nexacoreGrowthEquityFund.json';
-// import fundB from '../reports/polarisFutureVenturesFund.json';
-// import fundC from '../reports/vertexEdgeOpportunityFund.json';
+// import fundA from '../reports/blueOrbitCapitalFund.json';
+// import fundB from '../reports/fractalHorizonVenturesFund.json';
+// import fundC from '../reports/pinnacleAscendFund.json';
 // const funds = [fundA, fundB, fundC];
 
 const StyledDashboard = styled.div`
@@ -49,7 +49,7 @@ const Dashboard = () => {
   // TODO: loading, isError, error
   const { data: funds = [], isLoading: loading, isError, error } = useFunds();
 
-  const [chartCompanies, setChartCompanies] = useState(false);
+  const [chartCompanies, setChartCompanies] = useState(true);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
   const [selectedColumn, setSelectedColumn] = useState(DEFAULT_COLUMN);
 
@@ -62,9 +62,13 @@ const Dashboard = () => {
   const companyName = companySlug && fund ? deslugify(companySlug, funds, fund) : null;
 
   const view = useMemo(() => {
-    if (fundName && companyName) { return { mode: 'COMPANY', params: { fundName, companyName } }; }
-    if (fundName) { return { mode: 'FUND', params: { fundName } } };
-    return { mode: 'HOME', params: {} };
+    if (fundName && companyName) {
+      return { mode: 'COMPANY', params: { fundName, companyName } };
+    }
+    if (fundName) {
+      return { entityName: 'companyName', mode: 'FUND', params: { fundName } }
+    };
+    return { entityName: 'fundName', mode: 'HOME', params: {} };
   }, [fundName, companyName]);
 
   const goHome = () => nav('/');
@@ -148,11 +152,71 @@ const Dashboard = () => {
     return retVal;
   }, [fund, funds, view]);
 
-  const handleCrumbClick = (idx) => {
-    setChartCompanies(false);
+  const entityName = view.entityName;
+  const initialEntities = useMemo(() => {
+    return entityName ? portfolioData.map((e) => e[entityName]) : [];
+  }, [entityName, portfolioData]);
+  const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
+
+  useEffect(() => {
+    setSelectedEntities(new Set(initialEntities))
+  }, [initialEntities]);
+
+  const handleColumnHeaderClick = useCallback((idx, title, dataPoint) => {
+    setSelectedColumn({ idx, title, dataPoint })
+  }, []);
+
+  const handleCrumbClick = useCallback((idx) => {
+    // setChartCompanies(false);
     setSelectedColumn(DEFAULT_COLUMN);
     navByIdx[idx]();
-  };
+  }, [navByIdx]);
+
+  const handleFundNameClick = useCallback((fundName) => {
+    setSelectedColumn(DEFAULT_COLUMN);
+    goFund(fundName);
+  }, [goFund]);
+
+  const handleToggleEntity = useCallback((entity) => {
+    setSelectedEntities(prev => {
+      const next = new Set(prev);
+      next.has(entity) ? next.delete(entity) : next.add(entity);
+      return next;
+    });
+  }, []);
+
+  const handleToggleEntities = useCallback((entities) => {
+    setSelectedEntities((prev) => {
+      return prev.size === entities.length ? new Set() : new Set(entities)
+    });
+  }, []);
+
+  // TODO: contracts.ts --> useMemo<PortfolioModel>(...)
+  const model = useMemo(() => ({
+    chartCompanies,
+    filterPeriod,
+    portfolioData,
+    selectedColumn,
+    selectedEntities
+  }), [
+    chartCompanies,
+    filterPeriod,
+    portfolioData,
+    selectedColumn,
+    selectedEntities
+  ]);
+
+  const controller = useMemo(() => ({
+    onColumnHeaderClick: handleColumnHeaderClick,
+    onFundNameClick: handleFundNameClick,
+    onToggleEntity: handleToggleEntity,
+    onToggleEntities: handleToggleEntities
+  }), [
+    handleColumnHeaderClick,
+    handleFundNameClick,
+    handleToggleEntity,
+    handleToggleEntities
+  ]);
 
   return (
     <StyledDashboard>
@@ -160,11 +224,12 @@ const Dashboard = () => {
         fundName={fundName}
         view={view}
         onCrumbClick={handleCrumbClick}
-        onSwitchChange={(e) => setChartCompanies(e.target.checked)}
+        onSwitchChange={(e) => {}}
       />
       <Chart
         chartData={chartData}
         dataLabel={selectedColumn.title}
+        selectedEntities={selectedEntities}
       />
       <Filter
         options={FILTERS}
@@ -172,12 +237,9 @@ const Dashboard = () => {
         onChange={setFilterPeriod}
       />
       <Portfolio
-        portfolioData={portfolioData}
-        filterPeriod={filterPeriod}
-        selectedColumn={selectedColumn}
+        model={model}
         view={view}
-        onColumnHeaderClick={(idx, title, dataPoint) => setSelectedColumn({ idx, title, dataPoint })}
-        onFundNameClick={(fundName) => { setSelectedColumn(DEFAULT_COLUMN); goFund(fundName); }}
+        controller={controller}
       />
     </StyledDashboard>
   );
