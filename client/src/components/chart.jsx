@@ -8,7 +8,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import { useMediaQuery } from '@mui/material';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
 const StyledChart = styled(ResponsiveContainer)`
@@ -52,16 +52,32 @@ const SelectedEntitiesTooltip = ({ active, selectedEntities, dataLabel, payload 
 // i.e. dots & tooltip
 const MAX_COMPANIES_FOR_DETAILS = 5;
 
+const EntityLine = memo(({ color, name, opacity, showDetails }) => {
+  return (
+    <Line
+      key={name}
+      activeDot={showDetails}
+      connectNulls
+      dataKey={name}
+      dot={showDetails}
+      name={name}
+      opacity={opacity}
+      stroke={color}
+    />
+  );
+});
+
 const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
   const theme = useTheme();
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
-  const chartColors = theme.palette.chartLines || [];
+  const canShowDetails = selectedEntities.size <= MAX_COMPANIES_FOR_DETAILS;
   const { entityNames, dataPointsPerPeriod } = chartData;
   const firstPeriod = dataPointsPerPeriod.at(0)?.period;
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
+  const lineColors = theme.palette.chartLines || [];
+
   const periodTickFormatter = (val) => { let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}` };
-  const showDots = selectedEntities.size <= MAX_COMPANIES_FOR_DETAILS;
 
   const responsive = useMemo(() => {
     const height = isLargeViewport ? 500 : 400;
@@ -102,17 +118,14 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
         {
           entityNames.map((entityName, i) => {
             const isSelected = selectedEntities.has(entityName);
+            const showDetails = canShowDetails && isSelected;
 
             return (
-              <Line
-                key={entityName}
-                activeDot={isSelected && showDots}
-                connectNulls
-                dataKey={entityName}
-                dot={isSelected && showDots}
+              <EntityLine
+                color={lineColors[i % lineColors.length]}
                 name={entityName}
-                opacity={ isSelected ? 1 : theme.chart.line.opacityInactive }
-                stroke={chartColors[i % chartColors.length]}
+                opacity={isSelected ? 1 : theme.chart.line.opacityInactive}
+                showDetails={showDetails}
               />
             );
           })
