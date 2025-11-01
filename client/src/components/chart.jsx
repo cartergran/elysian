@@ -59,17 +59,26 @@ const SelectedEntitiesTooltip = ({ active, selectedEntities, dataLabel, payload 
 // i.e. dots & tooltip
 const MAX_COMPANIES_FOR_DETAILS = 5;
 
-const EntityLine = memo(({ color, name, opacity, showDetails }) => {
+const EntityLine = memo(({
+    activeDotRadius,
+    color,
+    isAnimationActive,
+    name,
+    opacity,
+    showDetails,
+    strokeWidth
+  }) => {
   return (
     <Line
-      key={name}
-      activeDot={showDetails}
+      activeDot={showDetails && { r: activeDotRadius }}
       connectNulls
       dataKey={name}
       dot={showDetails}
+      isAnimationActive={isAnimationActive}
       name={name}
       opacity={opacity}
       stroke={color}
+      strokeWidth={strokeWidth}
     />
   );
 });
@@ -135,10 +144,14 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
 
             return (
               <EntityLine
+                key={entityName}
+                activeDotRadius={theme.chart.activeDot.radiusDetailed}
                 color={lineColors[i % lineColors.length]}
+                isAnimationActive={!canShowDetails}
                 name={entityName}
-                opacity={isSelected ? 1 : theme.chart.line.opacityInactive}
+                opacity={isSelected ? 1 : theme.chart.line.opacityUnselected}
                 showDetails={showDetails}
+                strokeWidth={showDetails ? theme.chart.line.widthDetailed : undefined}
               />
             );
           })

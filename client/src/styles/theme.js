@@ -33,18 +33,12 @@ const muiTheme = createTheme({
     ]
   },
   chart: {
-    dot: {
-      r: 1,
-      rActive: 2
-    },
-    legend: {
-      fontSize: 14,
-      opacityInactive: 0.5
+    activeDot: {
+      radiusDetailed: 6
     },
     line: {
-      opacityInactive: 0.25,
-      width: 2,
-      widthActive: 4
+      opacityUnselected: 0.25,
+      widthDetailed: 2
     }
   },
   shape: {
