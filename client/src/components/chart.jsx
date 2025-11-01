@@ -7,7 +7,7 @@ import {
   YAxis
 } from 'recharts';
 import styled from 'styled-components';
-import { useMediaQuery } from '@mui/material';
+import { Typography, useMediaQuery } from '@mui/material';
 import { memo, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
@@ -27,27 +27,34 @@ const StyledTooltip = styled.div`
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
   color: black;
   padding: ${({ theme }) => theme.spacing(1)};
-
-  & .data-label {
-    font-weight: 700;
-  }
 `;
 
-/*
-TODO:
 const SelectedEntitiesTooltip = ({ active, selectedEntities, dataLabel, payload }) => {
   if (!active || !payload?.length) {
     return null;
   }
 
-  const entries = selectedEntities ? payload.filter(...)
+  const entries = selectedEntities ? payload.filter((p) => selectedEntities.has(p.dataKey)) : null;
   if (!entries) {
     return null;
   }
 
-  return (<div />);
-}
-*/;
+  return (
+    <StyledTooltip>
+      <Typography component="span" fontWeight="bold">{dataLabel}</Typography>
+      {
+        entries.map((entry) => (
+          <Typography
+            key={entry.dataKey}
+            component="span"
+          >
+            {entry.dataKey}: ${entry.value}
+          </Typography>
+        ))
+      }
+    </StyledTooltip>
+  );
+};
 
 // i.e. dots & tooltip
 const MAX_COMPANIES_FOR_DETAILS = 5;
@@ -111,7 +118,13 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
           tickFormatter={(val) => `$${val}`}
         />
         <Tooltip
-          content={() => null}
+          content={
+            canShowDetails ?
+              <SelectedEntitiesTooltip
+                dataLabel={dataLabel}
+                selectedEntities={selectedEntities}
+              /> : () => null
+          }
           isAnimationActive={false}
           wrapperStyle={{ pointerEvents: 'none' }} // avoids browser hit-testing
         />
