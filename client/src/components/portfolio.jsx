@@ -1,11 +1,13 @@
-import FundView from './views/fundView';
-import HomeView from './views/homeView';
+import styled from 'styled-components';
 import {
   Table,
   TableCell,
   TableContainer,
 } from '@mui/material';
-import styled from 'styled-components';
+import { useMemo } from 'react';
+
+import FundView from './views/fundView';
+import HomeView from './views/homeView';
 
 export const StyledHeaderCell = styled(TableCell)`
   color:
@@ -53,6 +55,7 @@ const viewRegistry = {
 };
 
 const Portfolio = ({ model, view, controller }) => {
+  const SelectableHeaderCell = useMemo(() => StyledHeaderCell, []);
   const ActiveView = viewRegistry[view.mode] || (() => null);
 
   return (
@@ -61,6 +64,7 @@ const Portfolio = ({ model, view, controller }) => {
         <ActiveView
           columnHeadersByDataPoint={COLUMN_HEADERS_BY_DATA_POINT[view.mode]}
           selectableColumnHeaders={SELECTABLE_COLUMN_HEADERS}
+          SelectableHeaderCell={SelectableHeaderCell}
           {...model}
           {...controller}
         />

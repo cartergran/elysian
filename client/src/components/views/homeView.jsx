@@ -5,7 +5,6 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { StyledHeaderCell } from '../portfolio';
 import { useMemo } from 'react';
 
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
@@ -17,7 +16,8 @@ const HomeView = ({
   selectableColumnHeaders,
   selectedColumn,
   onColumnHeaderClick,
-  onFundNameClick
+  onFundNameClick,
+  SelectableHeaderCell
 }) => {
   const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }) => {
     let currentInvestment = investmentRoundsSummary.at(-1);
@@ -43,7 +43,7 @@ const HomeView = ({
         <TableRow>
           {
             Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
-              <StyledHeaderCell
+              <SelectableHeaderCell
                 key={title}
                 $selectable={selectableColumnHeaders.includes(title)}
                 $selected={idx === selectedColumn.idx}
@@ -53,7 +53,7 @@ const HomeView = ({
                 }
               >
                 {title}
-              </StyledHeaderCell>
+              </SelectableHeaderCell>
             ))
           }
         </TableRow>

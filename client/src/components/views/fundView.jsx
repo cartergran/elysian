@@ -11,9 +11,6 @@ import styled from 'styled-components';
 import { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
-// TODO: remove circular dependency
-import { StyledHeaderCell } from '../portfolio';
-
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
 const StyledCheckbox = styled(Checkbox)`
@@ -41,7 +38,8 @@ const FundView = ({
   selectedEntities,
   onColumnHeaderClick,
   onToggleEntity,
-  onToggleEntities
+  onToggleEntities,
+  SelectableHeaderCell
 }) => {
   const theme = useTheme();
 
@@ -81,7 +79,7 @@ const FundView = ({
           }
           {
             Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
-              <StyledHeaderCell
+              <SelectableHeaderCell
                 key={title}
                 $selectable={selectableColumnHeaders.includes(title)}
                 $selected={idx === selectedColumn.idx}
@@ -91,7 +89,7 @@ const FundView = ({
                 }
               >
                 {title}
-              </StyledHeaderCell>
+              </SelectableHeaderCell>
             ))
           }
         </TableRow>
