@@ -19,7 +19,7 @@ const muiTheme = createTheme({
       disabled: '#A0A0A0',
       highlighted: '#2A2A2A'
     },
-    chartLines: [
+    entities: [
       '#aec7e8',
       '#ffbb78',
       '#98df8a',

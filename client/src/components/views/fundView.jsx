@@ -4,11 +4,15 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
+  Typography
 } from '@mui/material';
-import { StyledHeaderCell } from '../portfolio';
-import { useMemo } from 'react';
 import styled from 'styled-components';
+import { useMemo } from 'react';
+import { useTheme } from '@mui/material/styles';
+
+// TODO: remove circular dependency
+import { StyledHeaderCell } from '../portfolio';
 
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
@@ -18,6 +22,10 @@ const StyledCheckbox = styled(Checkbox)`
   & .MuiSvgIcon-root {
     font-size: 20px;
   }
+`;
+
+const StyledCompanyName = styled(Typography)`
+  color: ${({ $color }) => $color};
 `;
 
 // TODO:
@@ -35,6 +43,8 @@ const FundView = ({
   onToggleEntity,
   onToggleEntities
 }) => {
+  const theme = useTheme();
+
   const rows = useMemo(() => portfolioData.map(({ companyName, investmentRounds }) => {
     let currentInvestment = investmentRounds.at(-1);
     let returnPercent = getReturnPercent(
@@ -51,6 +61,7 @@ const FundView = ({
     };
   }), [portfolioData, filterPeriod]);
 
+  const entityColors = theme.palette.entities || [];
   const companyEntities = useMemo(() => rows.map((r) => r.companyName), [rows]);
   const indeterminate = selectedEntities.size > 0 && selectedEntities.size < companyEntities.length;
   const allSelected = companyEntities.length === selectedEntities.size;
@@ -87,9 +98,8 @@ const FundView = ({
       </TableHead>
       <TableBody>
         {
-          rows.map(({ companyName, totalValue, investedCapital, returnPercent }) => {
-            let cells = [
-              companyName,
+          rows.map(({ companyName, totalValue, investedCapital, returnPercent }, idx) => {
+            const cells = [
               formatCurrency(totalValue),
               formatCurrency(investedCapital),
               `${returnPercent}%`
@@ -103,6 +113,16 @@ const FundView = ({
                       checked={selectedEntities.has(companyName)}
                       onChange={(e) => { e.stopPropagation(); onToggleEntity(companyName); }}
                     />
+                  </TableCell>
+                }
+                {
+                  <TableCell>
+                    <StyledCompanyName
+                      variant="span"
+                      $color={entityColors[idx % entityColors.length]}
+                    >
+                      {companyName}
+                    </StyledCompanyName>
                   </TableCell>
                 }
                 {

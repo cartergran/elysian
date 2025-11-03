@@ -91,7 +91,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
   const { entityNames, dataPointsPerPeriod } = chartData;
   const firstPeriod = dataPointsPerPeriod.at(0)?.period;
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
-  const lineColors = theme.palette.chartLines || [];
+  const entityColors = theme.palette.entities || [];
 
   const periodTickFormatter = (val) => { let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}` };
 
@@ -138,7 +138,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
           wrapperStyle={{ pointerEvents: 'none' }} // avoids browser hit-testing
         />
         {
-          entityNames.map((entityName, i) => {
+          entityNames.map((entityName, idx) => {
             const isSelected = selectedEntities.has(entityName);
             const showDetails = canShowDetails && isSelected;
 
@@ -146,7 +146,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
               <EntityLine
                 key={entityName}
                 activeDotRadius={theme.chart.activeDot.radiusDetailed}
-                color={lineColors[i % lineColors.length]}
+                color={entityColors[idx % entityColors.length]}
                 isAnimationActive={!canShowDetails}
                 name={entityName}
                 opacity={isSelected ? 1 : theme.chart.line.opacityUnselected}
