@@ -8,7 +8,7 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import { Typography, useMediaQuery } from '@mui/material';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
 const StyledChart = styled(ResponsiveContainer)`
@@ -29,7 +29,7 @@ const StyledTooltip = styled.div`
   padding: ${({ theme }) => theme.spacing(1)};
 `;
 
-const SelectedEntitiesTooltip = ({ active, selectedEntities, dataLabel, payload }) => {
+const SelectedEntitiesTooltip = memo(({ active, selectedEntities, dataLabel, payload }) => {
   if (!active || !payload?.length) {
     return null;
   }
@@ -54,10 +54,48 @@ const SelectedEntitiesTooltip = ({ active, selectedEntities, dataLabel, payload 
       }
     </StyledTooltip>
   );
-};
+});
 
-// i.e. dots & tooltip
-const MAX_COMPANIES_FOR_DETAILS = 5;
+const Axes = memo(({
+  firstPeriod,
+  isLargeViewport,
+  lastPeriod,
+  periodTickFormatter,
+  tickFontSize,
+  tickDelta
+}) => {
+  const xTickProps = useMemo(() => ({
+    dy: tickDelta,
+    fontSize: tickFontSize
+  }), [tickFontSize, tickDelta]);
+
+  const yTickProps = useMemo(() => ({
+    dx: -tickDelta,
+    fontSize: tickFontSize
+  }), [tickFontSize, tickDelta]);
+
+  const ticks = useMemo(() => (
+    !isLargeViewport ? [firstPeriod, lastPeriod] : undefined
+  ), [firstPeriod, isLargeViewport, lastPeriod]);
+
+  return (
+    <>
+      <XAxis
+        dataKey="period"
+        // interval="preserveStartEnd"
+        stroke="white"
+        tick={xTickProps}
+        tickFormatter={periodTickFormatter}
+        ticks={ticks}
+      />
+      <YAxis
+        tick={yTickProps}
+        tickFormatter={(val) => `$${val}`}
+        stroke="white"
+      />
+    </>
+  );
+});
 
 const EntityLine = memo(({
     activeDotRadius,
@@ -83,6 +121,9 @@ const EntityLine = memo(({
   );
 });
 
+// i.e. dots & tooltip
+const MAX_COMPANIES_FOR_DETAILS = 5;
+
 const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
   const theme = useTheme();
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
@@ -93,7 +134,10 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
   const entityColors = theme.palette.entities || [];
 
-  const periodTickFormatter = (val) => { let [y, q] = val.split('-'); return `${q} '${y.slice(-2)}` };
+  const periodTickFormatter = useCallback((val) => {
+    let [y, q] = val.split('-');
+    return `${q}'${y.slice(-2)}`
+  }, []);
 
   const responsive = useMemo(() => {
     const height = isLargeViewport ? 500 : 400;
@@ -105,41 +149,43 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
     }
   }, [isLargeViewport, theme]);
 
+  const selectedEntitiesMask = useMemo(() => {
+    const m = new Map();
+    for (const n of entityNames) {
+      m.set(n, selectedEntities.has(n));
+    }
+    return m;
+  }, [entityNames, selectedEntities]);
+
+  const toolTipContent = useMemo(() => (
+    canShowDetails ?
+      <SelectedEntitiesTooltip
+        dataLabel={dataLabel}
+        selectedEntities={selectedEntities}
+      /> : () => null
+  ), [canShowDetails, dataLabel, selectedEntities]);
+
   return (
     <StyledChart height={responsive.height}>
       <LineChart data={dataPointsPerPeriod}>
-        <XAxis
-          dataKey="period"
-          stroke="white"
-          tick={{
-            dy: parseInt(theme.spacing(1)),
-            fontSize: responsive.tickFontSize
-          }}
-          tickFormatter={periodTickFormatter}
-          {...(!isLargeViewport && { ticks: [firstPeriod, lastPeriod] })}
+        <Axes
+          firstPeriod={firstPeriod}
+          isLargeViewport={isLargeViewport}
+          lastPeriod={lastPeriod}
+          periodTickFormatter={periodTickFormatter}
+          tickDelta={parseInt(theme.spacing(1))}
+          tickFontSize={responsive.tickFontSize}
         />
-        <YAxis
-          stroke="white"
-          tick={{
-            dx: -parseInt(theme.spacing(1)),
-            fontSize: responsive.tickFontSize
-          }}
-          tickFormatter={(val) => `$${val}`}
-        />
+
         <Tooltip
-          content={
-            canShowDetails ?
-              <SelectedEntitiesTooltip
-                dataLabel={dataLabel}
-                selectedEntities={selectedEntities}
-              /> : () => null
-          }
+          content={toolTipContent}
           isAnimationActive={false}
           wrapperStyle={{ pointerEvents: 'none' }} // avoids browser hit-testing
         />
+
         {
           entityNames.map((entityName, idx) => {
-            const isSelected = selectedEntities.has(entityName);
+            const isSelected = selectedEntitiesMask.get(entityName);
             const showDetails = canShowDetails && isSelected;
 
             return (
