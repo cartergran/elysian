@@ -66,9 +66,9 @@ const Dashboard = () => {
       return { mode: 'COMPANY', params: { fundName, companyName } };
     }
     if (fundName) {
-      return { entityName: 'companyName', mode: 'FUND', params: { fundName } }
+      return { entityName: 'company', mode: 'FUND', params: { fundName } }
     };
-    return { entityName: 'fundName', mode: 'HOME', params: {} };
+    return { entityName: 'fund', mode: 'HOME', params: {} };
   }, [fundName, companyName]);
 
   const goHome = () => nav('/');
@@ -152,10 +152,10 @@ const Dashboard = () => {
     return retVal;
   }, [fund, funds, view]);
 
-  const entityName = view.entityName;
+  const entityNameKey = view.entityName ? `${view.entityName}Name` : null;
   const initialEntities = useMemo(() => {
-    return entityName ? portfolioData.map((e) => e[entityName]) : [];
-  }, [entityName, portfolioData]);
+    return entityNameKey ? portfolioData.map((e) => e[entityNameKey]) : [];
+  }, [entityNameKey, portfolioData]);
   const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
 
   useEffect(() => {
