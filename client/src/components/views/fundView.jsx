@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 import { useMemo } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
@@ -23,6 +23,7 @@ const StyledCheckbox = styled(Checkbox)`
 
 const StyledCompanyName = styled(Typography)`
   color: ${({ $color }) => $color};
+  cursor: pointer;
 `;
 
 // TODO:
@@ -37,8 +38,9 @@ const FundView = ({
   selectedColumn,
   selectedEntities,
   onColumnHeaderClick,
-  onToggleEntity,
-  onToggleEntities,
+  onHoverRow,
+  onToggleRow,
+  onToggleRows,
   SelectableHeaderCell
 }) => {
   const theme = useTheme();
@@ -73,7 +75,7 @@ const FundView = ({
               <StyledCheckbox
                 checked={allSelected}
                 indeterminate={indeterminate}
-                onChange={(e) => { e.stopPropagation(); onToggleEntities(companyEntities); }}
+                onChange={(e) => { e.stopPropagation(); onToggleRows(companyEntities); }}
               />
             </TableCell>
           }
@@ -85,7 +87,7 @@ const FundView = ({
                 $selected={idx === selectedColumn.idx}
                 onClick={() =>
                   selectableColumnHeaders.includes(title) &&
-                  onColumnHeaderClick(idx, title, dataPoint)
+                  onColumnHeaderClick({ idx, title, dataPoint })
                 }
               >
                 {title}
@@ -104,12 +106,17 @@ const FundView = ({
             ];
 
             return (
-              <TableRow key={companyName}>
+              <TableRow
+                key={companyName}
+                hover
+                onMouseEnter={() => onHoverRow(companyName)}
+                onMouseLeave={() => onHoverRow(null)}
+              >
                 {
-                  <TableCell $open={chartCompanies}>
+                  <TableCell>
                     <StyledCheckbox
                       checked={selectedEntities.has(companyName)}
-                      onChange={(e) => { e.stopPropagation(); onToggleEntity(companyName); }}
+                      onChange={(e) => { e.stopPropagation(); onToggleRow(companyName); }}
                     />
                   </TableCell>
                 }
@@ -118,6 +125,7 @@ const FundView = ({
                     <StyledCompanyName
                       variant="span"
                       $color={entityColors[idx % entityColors.length]}
+                      onClick={(e) => { e.stopPropagation(); onToggleRow(companyName); }}
                     >
                       {companyName}
                     </StyledCompanyName>

@@ -156,15 +156,22 @@ const Dashboard = () => {
   const initialEntities = useMemo(() => {
     return entityNameKey ? portfolioData.map((e) => e[entityNameKey]) : [];
   }, [entityNameKey, portfolioData]);
+
+  const [hoveredEntity, setHoveredEntity] = useState(null);
   const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
 
-  useEffect(() => {
-    setSelectedEntities(new Set(initialEntities))
-  }, [initialEntities]);
+  const visibleEntities = useMemo(() => {
+    if (!hoveredEntity) {
+      return selectedEntities;
+    }
+    const next = new Set(selectedEntities);
+    next.add(hoveredEntity);
+    return next;
+  }, [hoveredEntity, selectedEntities]);
 
-  const handleColumnHeaderClick = useCallback((idx, title, dataPoint) => {
-    setSelectedColumn({ idx, title, dataPoint })
-  }, []);
+  useEffect(() => {
+    setSelectedEntities(new Set(initialEntities));
+  }, [initialEntities]);
 
   const handleCrumbClick = useCallback((idx) => {
     // setChartCompanies(false);
@@ -177,17 +184,17 @@ const Dashboard = () => {
     goFund(fundName);
   }, [goFund]);
 
-  const handleToggleEntity = useCallback((entity) => {
+  const handleToggleRow = useCallback((entityName) => {
     setSelectedEntities(prev => {
       const next = new Set(prev);
-      next.has(entity) ? next.delete(entity) : next.add(entity);
+      next.has(entityName) ? next.delete(entityName) : next.add(entityName);
       return next;
     });
   }, []);
 
-  const handleToggleEntities = useCallback((entities) => {
+  const handleToggleRows = useCallback((entityNames) => {
     setSelectedEntities((prev) => {
-      return prev.size === entities.length ? new Set() : new Set(entities)
+      return prev.size === entityNames.length ? new Set() : new Set(entityNames)
     });
   }, []);
 
@@ -207,15 +214,15 @@ const Dashboard = () => {
   ]);
 
   const controller = useMemo(() => ({
-    onColumnHeaderClick: handleColumnHeaderClick,
+    onColumnHeaderClick: setSelectedColumn,
     onFundNameClick: handleFundNameClick,
-    onToggleEntity: handleToggleEntity,
-    onToggleEntities: handleToggleEntities
+    onHoverRow: setHoveredEntity,
+    onToggleRow: handleToggleRow,
+    onToggleRows: handleToggleRows
   }), [
-    handleColumnHeaderClick,
     handleFundNameClick,
-    handleToggleEntity,
-    handleToggleEntities
+    handleToggleRow,
+    handleToggleRows
   ]);
 
   return (
@@ -230,6 +237,7 @@ const Dashboard = () => {
         chartData={chartData}
         dataLabel={selectedColumn.title}
         selectedEntities={selectedEntities}
+        visibleEntities={visibleEntities}
       />
       <Filter
         options={FILTERS}

@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material';
+import { alpha, createTheme } from '@mui/material/styles';
 import { css } from 'styled-components';
 
 const muiTheme = createTheme({
@@ -17,7 +17,8 @@ const muiTheme = createTheme({
     },
     action: {
       disabled: '#A0A0A0',
-      highlighted: '#2A2A2A'
+      highlighted: '#2A2A2A',
+      hover: alpha('#552583', 0.14)
     },
     entities: [
       '#aec7e8',

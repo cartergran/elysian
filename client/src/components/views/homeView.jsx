@@ -49,7 +49,7 @@ const HomeView = ({
                 $selected={idx === selectedColumn.idx}
                 onClick={() =>
                   selectableColumnHeaders.includes(title) &&
-                  onColumnHeaderClick(idx, title, dataPoint)
+                  onColumnHeaderClick({ idx, title, dataPoint })
                 }
               >
                 {title}

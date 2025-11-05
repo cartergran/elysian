@@ -124,7 +124,7 @@ const EntityLine = memo(({
 // i.e. dots & tooltip
 const MAX_COMPANIES_FOR_DETAILS = 5;
 
-const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
+const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities, visibleEntities }) => {
   const theme = useTheme();
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -149,21 +149,25 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
     }
   }, [isLargeViewport, theme]);
 
-  const selectedEntitiesMask = useMemo(() => {
+  const visibleEntitiesMask = useMemo(() => {
     const m = new Map();
     for (const n of entityNames) {
-      m.set(n, selectedEntities.has(n));
+      m.set(n, visibleEntities.has(n));
     }
     return m;
-  }, [entityNames, selectedEntities]);
+  }, [entityNames, visibleEntities]);
 
-  const toolTipContent = useMemo(() => (
+  const tooltipContent = useMemo(() => (
     canShowDetails ?
       <SelectedEntitiesTooltip
         dataLabel={dataLabel}
         selectedEntities={selectedEntities}
       /> : () => null
   ), [canShowDetails, dataLabel, selectedEntities]);
+
+  const tooltipWrapperStyle = useMemo(() => ({
+    pointerEvents: 'none'
+  }), []);
 
   return (
     <StyledChart height={responsive.height}>
@@ -178,15 +182,15 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
         />
 
         <Tooltip
-          content={toolTipContent}
+          content={tooltipContent}
           isAnimationActive={false}
-          wrapperStyle={{ pointerEvents: 'none' }} // avoids browser hit-testing
+          wrapperStyle={tooltipWrapperStyle} // avoids browser hit-testing
         />
 
         {
           entityNames.map((entityName, idx) => {
-            const isSelected = selectedEntitiesMask.get(entityName);
-            const showDetails = canShowDetails && isSelected;
+            const isVisible = visibleEntitiesMask.get(entityName);
+            const showDetails = canShowDetails && isVisible;
 
             return (
               <EntityLine
@@ -195,7 +199,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities }) => {
                 color={entityColors[idx % entityColors.length]}
                 isAnimationActive={!canShowDetails}
                 name={entityName}
-                opacity={isSelected ? 1 : theme.chart.line.opacityUnselected}
+                opacity={isVisible ? 1 : theme.chart.line.opacityUnselected}
                 showDetails={showDetails}
                 strokeWidth={showDetails ? theme.chart.line.widthDetailed : undefined}
               />
