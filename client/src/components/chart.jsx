@@ -11,6 +11,8 @@ import { Typography, useMediaQuery } from '@mui/material';
 import { memo, useCallback, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
+import { useAnimateLineOnAdd } from '../hooks/lines';
+
 const StyledChart = styled(ResponsiveContainer)`
   & div:focus-visible,
   & svg:focus {
@@ -109,10 +111,12 @@ const EntityLine = memo(({
   return (
     <Line
       activeDot={showDetails && { r: activeDotRadius }}
+      animationDuration={2300}
       connectNulls
       dataKey={name}
       dot={showDetails}
       isAnimationActive={isAnimationActive}
+      // isUpdateAnimationActive={false}
       name={name}
       opacity={opacity}
       stroke={color}
@@ -134,6 +138,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities, visible
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
   const entityColors = theme.palette.entities || [];
 
+  const getAnimateLine = useAnimateLineOnAdd(entityNames, selectedEntities);
   const periodTickFormatter = useCallback((val) => {
     let [y, q] = val.split('-');
     return `${q}'${y.slice(-2)}`
@@ -190,14 +195,17 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities, visible
         {
           entityNames.map((entityName, idx) => {
             const isVisible = visibleEntitiesMask.get(entityName);
+            const shouldAnimate = canShowDetails && getAnimateLine(entityName);
             const showDetails = canShowDetails && isVisible;
+
+            const lineKey = shouldAnimate ? `${entityName}::anim` : `${entityName}::static`;
 
             return (
               <EntityLine
-                key={entityName}
+                key={lineKey}
                 activeDotRadius={theme.chart.activeDot.radiusDetailed}
                 color={entityColors[idx % entityColors.length]}
-                isAnimationActive={!canShowDetails}
+                isAnimationActive={shouldAnimate}
                 name={entityName}
                 opacity={isVisible ? 1 : theme.chart.line.opacityUnselected}
                 showDetails={showDetails}
