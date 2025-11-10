@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useMemo, useRef } from 'react';
 
-const useAnimateLineOnAdd = (entityNames, selectedEntities) => {
+const useLineAnimationOnAdd = (entityNames, selectedEntities) => {
   const prevSelectedRef = useRef(new Set(selectedEntities));
   const addedRef = useRef(new Set());
 
@@ -31,5 +31,5 @@ const useAnimateLineOnAdd = (entityNames, selectedEntities) => {
 };
 
 export {
-  useAnimateLineOnAdd
+  useLineAnimationOnAdd
 };

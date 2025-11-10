@@ -8,10 +8,10 @@ import {
 } from 'recharts';
 import styled from 'styled-components';
 import { Typography, useMediaQuery } from '@mui/material';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 
-import { useAnimateLineOnAdd } from '../hooks/lines';
+import { useLineAnimationOnAdd } from '../hooks/lines';
 
 const StyledChart = styled(ResponsiveContainer)`
   & div:focus-visible,
@@ -111,12 +111,12 @@ const EntityLine = memo(({
   return (
     <Line
       activeDot={showDetails && { r: activeDotRadius }}
-      animationDuration={2300}
+      animationDuration={ANIMATION_DURATION}
       connectNulls
       dataKey={name}
       dot={showDetails}
       isAnimationActive={isAnimationActive}
-      // isUpdateAnimationActive={false}
+      isUpdateAnimationActive={false}
       name={name}
       opacity={opacity}
       stroke={color}
@@ -125,10 +125,16 @@ const EntityLine = memo(({
   );
 });
 
-// i.e. dots & tooltip
-const MAX_COMPANIES_FOR_DETAILS = 5;
+const ANIMATION_DURATION = 1400; // ms
+const MAX_COMPANIES_FOR_DETAILS = 5; // i.e. dots & tooltip
 
-const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities, visibleEntities }) => {
+const Chart = ({
+  chartData,
+  dataLabel = 'Total Value',
+  newEntities,
+  selectedEntities,
+  visibleEntities
+}) => {
   const theme = useTheme();
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -138,7 +144,7 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities, visible
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
   const entityColors = theme.palette.entities || [];
 
-  const getAnimateLine = useAnimateLineOnAdd(entityNames, selectedEntities);
+  const getLineAnimationActive= useLineAnimationOnAdd(entityNames, selectedEntities);
   const periodTickFormatter = useCallback((val) => {
     let [y, q] = val.split('-');
     return `${q}'${y.slice(-2)}`
@@ -153,14 +159,6 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities, visible
       tickFontSize
     }
   }, [isLargeViewport, theme]);
-
-  const visibleEntitiesMask = useMemo(() => {
-    const m = new Map();
-    for (const n of entityNames) {
-      m.set(n, visibleEntities.has(n));
-    }
-    return m;
-  }, [entityNames, visibleEntities]);
 
   const tooltipContent = useMemo(() => (
     canShowDetails ?
@@ -194,22 +192,23 @@ const Chart = ({ chartData, dataLabel = 'Total Value', selectedEntities, visible
 
         {
           entityNames.map((entityName, idx) => {
-            const isVisible = visibleEntitiesMask.get(entityName);
-            const shouldAnimate = canShowDetails && getAnimateLine(entityName);
+            const isVisible = visibleEntities.has(entityName);
             const showDetails = canShowDetails && isVisible;
 
-            const lineKey = shouldAnimate ? `${entityName}::anim` : `${entityName}::static`;
+             // new key --> remount --> fresh animation :)
+            const lineAnimationActive = canShowDetails && getLineAnimationActive(entityName);
+            const lineKey = lineAnimationActive ? `${entityName}::anim` : `${entityName}::static`;
 
             return (
               <EntityLine
                 key={lineKey}
                 activeDotRadius={theme.chart.activeDot.radiusDetailed}
                 color={entityColors[idx % entityColors.length]}
-                isAnimationActive={shouldAnimate}
+                isAnimationActive={newEntities || lineAnimationActive}
                 name={entityName}
                 opacity={isVisible ? 1 : theme.chart.line.opacityUnselected}
                 showDetails={showDetails}
-                strokeWidth={showDetails ? theme.chart.line.widthDetailed : undefined}
+                strokeWidth={showDetails ? theme.chart.line.widthDetailed : 1}
               />
             );
           })

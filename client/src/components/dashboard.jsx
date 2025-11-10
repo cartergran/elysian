@@ -158,6 +158,7 @@ const Dashboard = () => {
   }, [entityNameKey, portfolioData]);
 
   const [hoveredEntity, setHoveredEntity] = useState(null);
+  const [newEntities, setNewEntities] = useState(true);
   const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
 
   const visibleEntities = useMemo(() => {
@@ -171,6 +172,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     setSelectedEntities(new Set(initialEntities));
+    setNewEntities(true);
   }, [initialEntities]);
 
   const handleCrumbClick = useCallback((idx) => {
@@ -190,12 +192,14 @@ const Dashboard = () => {
       next.has(entityName) ? next.delete(entityName) : next.add(entityName);
       return next;
     });
+    setNewEntities(false);
   }, []);
 
   const handleToggleRows = useCallback((entityNames) => {
     setSelectedEntities((prev) => {
       return prev.size === entityNames.length ? new Set() : new Set(entityNames)
     });
+    setNewEntities(false);
   }, []);
 
   // TODO: contracts.ts --> useMemo<PortfolioModel>(...)
@@ -236,6 +240,7 @@ const Dashboard = () => {
       <Chart
         chartData={chartData}
         dataLabel={selectedColumn.title}
+        newEntities={newEntities}
         selectedEntities={selectedEntities}
         visibleEntities={visibleEntities}
       />
