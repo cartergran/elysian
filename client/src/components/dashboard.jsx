@@ -49,7 +49,7 @@ const Dashboard = () => {
   // TODO: loading, isError, error
   const { data: funds = [], isLoading: loading, isError, error } = useFunds();
 
-  const [chartCompanies, setChartCompanies] = useState(true);
+  const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
   const [selectedColumn, setSelectedColumn] = useState(DEFAULT_COLUMN);
 
@@ -152,11 +152,7 @@ const Dashboard = () => {
     return retVal;
   }, [fund, funds, view]);
 
-  const entityNameKey = view.entityName ? `${view.entityName}Name` : null;
-  const initialEntities = useMemo(() => {
-    return entityNameKey ? portfolioData.map((e) => e[entityNameKey]) : [];
-  }, [entityNameKey, portfolioData]);
-
+  const initialEntities = useMemo(() => chartData.entityNames, [chartData]);
   const [hoveredEntity, setHoveredEntity] = useState(null);
   const [newEntities, setNewEntities] = useState(true);
   const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
@@ -176,7 +172,7 @@ const Dashboard = () => {
   }, [initialEntities]);
 
   const handleCrumbClick = useCallback((idx) => {
-    // setChartCompanies(false);
+    setChartCompanies(false);
     setSelectedColumn(DEFAULT_COLUMN);
     navByIdx[idx]();
   }, [navByIdx]);
@@ -235,7 +231,7 @@ const Dashboard = () => {
         fundName={fundName}
         view={view}
         onCrumbClick={handleCrumbClick}
-        onSwitchChange={(e) => {}}
+        onSwitchChange={(e) => setChartCompanies(e.target.checked)}
       />
       <Chart
         chartData={chartData}

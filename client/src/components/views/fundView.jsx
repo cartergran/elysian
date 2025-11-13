@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 import { useMemo } from 'react';
-import { alpha, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
@@ -26,8 +26,12 @@ const StyledCompanyName = styled(Typography)`
   cursor: pointer;
 `;
 
-// TODO:
-const ToggleCell = styled(TableCell)``;
+const ToggleCell = styled(TableCell)`
+  animation: slideIn 0.3s ease;
+  backface-visibility: hidden; // prevents flickering
+  transform: translateZ(0); // hardware acceleration
+  will-change: opacity, transform; // performance optimization
+`;
 
 const FundView = ({
   chartCompanies,
@@ -71,13 +75,15 @@ const FundView = ({
       <TableHead>
         <TableRow>
           {
-            <TableCell $open={chartCompanies}>
-              <StyledCheckbox
-                checked={allSelected}
-                indeterminate={indeterminate}
-                onChange={(e) => { e.stopPropagation(); onToggleRows(companyEntities); }}
-              />
-            </TableCell>
+            chartCompanies && (
+              <ToggleCell>
+                <StyledCheckbox
+                  checked={allSelected}
+                  indeterminate={indeterminate}
+                  onChange={(e) => { e.stopPropagation(); onToggleRows(companyEntities); }}
+                />
+              </ToggleCell>
+            )
           }
           {
             Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
@@ -113,12 +119,14 @@ const FundView = ({
                 onMouseLeave={() => onHoverRow(null)}
               >
                 {
-                  <TableCell>
-                    <StyledCheckbox
-                      checked={selectedEntities.has(companyName)}
-                      onChange={(e) => { e.stopPropagation(); onToggleRow(companyName); }}
-                    />
-                  </TableCell>
+                  chartCompanies && (
+                    <ToggleCell>
+                      <StyledCheckbox
+                        checked={selectedEntities.has(companyName)}
+                        onChange={(e) => { e.stopPropagation(); onToggleRow(companyName); }}
+                      />
+                    </ToggleCell>
+                  )
                 }
                 {
                   <TableCell>

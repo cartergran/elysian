@@ -21,7 +21,6 @@ const Switch = ({ label, onChange }) => {
     <StyledSwitch direction="row" alignItems="center">
       <MUISwitch
         color="secondary"
-        defaultChecked
         size={isLargeViewport ? 'large' : 'small'}
         onChange={onChange}
       />

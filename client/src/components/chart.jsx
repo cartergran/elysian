@@ -126,7 +126,7 @@ const EntityLine = memo(({
 });
 
 const ANIMATION_DURATION = 1400; // ms
-const MAX_COMPANIES_FOR_DETAILS = 5; // i.e. dots & tooltip
+const MAX_ENTITIES_FOR_DETAILS = 5; // i.e. dots & tooltip
 
 const Chart = ({
   chartData,
@@ -138,7 +138,7 @@ const Chart = ({
   const theme = useTheme();
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
-  const canShowDetails = selectedEntities.size <= MAX_COMPANIES_FOR_DETAILS;
+  const canShowDetails = selectedEntities.size <= MAX_ENTITIES_FOR_DETAILS;
   const { entityNames, dataPointsPerPeriod } = chartData;
   const firstPeriod = dataPointsPerPeriod.at(0)?.period;
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;

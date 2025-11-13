@@ -16,6 +16,18 @@ const GlobalStyle = createGlobalStyle`
     background-color: black;
     padding: 0;
   }
+
+  // animations
+  @keyframes slideIn {
+    from {
+      transform: translateX(-${({ theme }) => theme.spacing(2)});
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
 `;
 
 export default GlobalStyle;
