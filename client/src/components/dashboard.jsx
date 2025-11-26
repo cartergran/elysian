@@ -204,13 +204,15 @@ const Dashboard = () => {
     filterPeriod,
     portfolioData,
     selectedColumn,
-    selectedEntities
+    selectedEntities,
+    visibleEntities
   }), [
     chartCompanies,
     filterPeriod,
     portfolioData,
     selectedColumn,
-    selectedEntities
+    selectedEntities,
+    visibleEntities
   ]);
 
   const controller = useMemo(() => ({

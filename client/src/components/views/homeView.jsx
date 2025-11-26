@@ -11,13 +11,14 @@ import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
 const HomeView = ({
   columnHeadersByDataPoint,
+  filterColumnHeaders,
   filterPeriod,
   portfolioData,
-  selectableColumnHeaders,
+  selectableColumnHeader,
   selectedColumn,
+  FilterHeaderCell,
   onColumnHeaderClick,
-  onFundNameClick,
-  SelectableHeaderCell
+  onFundNameClick
 }) => {
   const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }) => {
     let currentInvestment = investmentRoundsSummary.at(-1);
@@ -41,19 +42,20 @@ const HomeView = ({
     <>
       <TableHead>
         <TableRow>
+          { <TableCell>{selectableColumnHeader}</TableCell> }
           {
             Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
-              <SelectableHeaderCell
+              <FilterHeaderCell
                 key={title}
-                $selectable={selectableColumnHeaders.includes(title)}
+                $selectable={filterColumnHeaders.includes(title)}
                 $selected={idx === selectedColumn.idx}
                 onClick={() =>
-                  selectableColumnHeaders.includes(title) &&
+                  filterColumnHeaders.includes(title) &&
                   onColumnHeaderClick({ idx, title, dataPoint })
                 }
               >
                 {title}
-              </SelectableHeaderCell>
+              </FilterHeaderCell>
             ))
           }
         </TableRow>

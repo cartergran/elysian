@@ -4,12 +4,11 @@ import {
   TableCell,
   TableContainer,
 } from '@mui/material';
-import { useMemo } from 'react';
 
 import FundView from './views/fundView';
 import HomeView from './views/homeView';
 
-export const StyledHeaderCell = styled(TableCell)`
+const FilterHeaderCell = styled(TableCell)`
   color:
     ${({ theme, $selected  }) => $selected
       ? theme.palette.primary.light
@@ -27,7 +26,6 @@ export const StyledHeaderCell = styled(TableCell)`
 
 const COLUMN_HEADERS_BY_DATA_POINT = {
   HOME: {
-    fundName: 'Fund',
     totalValue: 'Total Value',
     investedCapital: 'Invested Capital',
     realizedValue: 'Realized Value',
@@ -35,19 +33,23 @@ const COLUMN_HEADERS_BY_DATA_POINT = {
     returnPercent: 'Return'
   },
   FUND: {
-    companyName: 'Company',
     totalValue: 'Total Value',
     investedCapital: 'Invested Capital',
     returnPercent: 'Return'
   }
 };
 
-const SELECTABLE_COLUMN_HEADERS = [
+const FILTER_COLUMN_HEADERS = [
   'Total Value',
   'Invested Capital',
   'Realized Value',
   'Unrealized Value'
 ];
+
+const SELECTABLE_COLUMN_HEADERS = {
+  HOME: 'Fund',
+  FUND: 'Company'
+};
 
 const viewRegistry = {
   HOME: HomeView,
@@ -55,7 +57,6 @@ const viewRegistry = {
 };
 
 const Portfolio = ({ model, view, controller }) => {
-  const SelectableHeaderCell = useMemo(() => StyledHeaderCell, []);
   const ActiveView = viewRegistry[view.mode] || (() => null);
 
   return (
@@ -63,8 +64,9 @@ const Portfolio = ({ model, view, controller }) => {
       <Table>
         <ActiveView
           columnHeadersByDataPoint={COLUMN_HEADERS_BY_DATA_POINT[view.mode]}
-          selectableColumnHeaders={SELECTABLE_COLUMN_HEADERS}
-          SelectableHeaderCell={SelectableHeaderCell}
+          filterColumnHeaders={FILTER_COLUMN_HEADERS}
+          selectableColumnHeader={SELECTABLE_COLUMN_HEADERS[view.mode]}
+          FilterHeaderCell={FilterHeaderCell}
           {...model}
           {...controller}
         />

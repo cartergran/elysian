@@ -1,5 +1,4 @@
 import {
-  Checkbox,
   // TODO: Link,
   TableBody,
   TableCell,
@@ -13,39 +12,40 @@ import { useTheme } from '@mui/material/styles';
 
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
 
-const StyledCheckbox = styled(Checkbox)`
-  padding: 0;
-
-  & .MuiSvgIcon-root {
-    font-size: 20px;
-  }
-`;
-
-const StyledCompanyName = styled(Typography)`
+const ColoredCompanyName = styled(Typography)`
   color: ${({ $color }) => $color};
-  cursor: pointer;
 `;
 
-const ToggleCell = styled(TableCell)`
-  animation: slideIn 0.3s ease;
-  backface-visibility: hidden; // prevents flickering
-  transform: translateZ(0); // hardware acceleration
-  will-change: opacity, transform; // performance optimization
+const FadedTableRow = styled(TableRow)`
+  opacity: ${({ $isVisible }) => $isVisible ? 1 : 0.25};
+  transition: opacity 0.25s ease;
 `;
+
+const SelectableTableCell = styled(TableCell)`
+  cursor: ${({ $selectable }) => $selectable ? 'pointer' : 'default'};
+`;
+
+// const ToggleCell = styled(TableCell)`
+//   animation: slideIn 0.25s ease;
+//   backface-visibility: hidden; // prevents flickering
+//   transform: translateZ(0); // hardware acceleration
+//   will-change: opacity, transform; // performance optimization
+// `;
 
 const FundView = ({
   chartCompanies,
   columnHeadersByDataPoint,
+  filterColumnHeaders,
   filterPeriod,
   portfolioData,
-  selectableColumnHeaders,
+  selectableColumnHeader,
   selectedColumn,
-  selectedEntities,
+  visibleEntities,
+  FilterHeaderCell,
   onColumnHeaderClick,
   onHoverRow,
   onToggleRow,
   onToggleRows,
-  SelectableHeaderCell
 }) => {
   const theme = useTheme();
 
@@ -67,37 +67,36 @@ const FundView = ({
 
   const entityColors = theme.palette.entities || [];
   const companyEntities = useMemo(() => rows.map((r) => r.companyName), [rows]);
-  const indeterminate = selectedEntities.size > 0 && selectedEntities.size < companyEntities.length;
-  const allSelected = companyEntities.length === selectedEntities.size;
+  const handleSelectableHeaderClick = (e) => {
+    e.stopPropagation();
+    onToggleRows(companyEntities);
+  };
 
   return (
     <>
       <TableHead>
         <TableRow>
           {
-            chartCompanies && (
-              <ToggleCell>
-                <StyledCheckbox
-                  checked={allSelected}
-                  indeterminate={indeterminate}
-                  onChange={(e) => { e.stopPropagation(); onToggleRows(companyEntities); }}
-                />
-              </ToggleCell>
-            )
+            <SelectableTableCell
+              $selectable={chartCompanies}
+              onClick={handleSelectableHeaderClick}
+            >
+              {selectableColumnHeader}
+            </SelectableTableCell>
           }
           {
             Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
-              <SelectableHeaderCell
+              <FilterHeaderCell
                 key={title}
-                $selectable={selectableColumnHeaders.includes(title)}
+                $selectable={filterColumnHeaders.includes(title)}
                 $selected={idx === selectedColumn.idx}
                 onClick={() =>
-                  selectableColumnHeaders.includes(title) &&
+                  filterColumnHeaders.includes(title) &&
                   onColumnHeaderClick({ idx, title, dataPoint })
                 }
               >
                 {title}
-              </SelectableHeaderCell>
+              </FilterHeaderCell>
             ))
           }
         </TableRow>
@@ -110,34 +109,35 @@ const FundView = ({
               formatCurrency(investedCapital),
               `${returnPercent}%`
             ];
+            const isVisible = !chartCompanies || visibleEntities.has(companyName);
+            const handleSelectableCellClick = (e) => {
+              e.stopPropagation();
+              onToggleRow(companyName);
+            };
 
             return (
-              <TableRow
+              <FadedTableRow
                 key={companyName}
-                hover
-                onMouseEnter={() => onHoverRow(companyName)}
-                onMouseLeave={() => onHoverRow(null)}
+                $isVisible={isVisible}
+                {...chartCompanies && {
+                  onMouseEnter: () => onHoverRow(companyName),
+                  onMouseLeave: () => onHoverRow(null)
+                }}
               >
                 {
-                  chartCompanies && (
-                    <ToggleCell>
-                      <StyledCheckbox
-                        checked={selectedEntities.has(companyName)}
-                        onChange={(e) => { e.stopPropagation(); onToggleRow(companyName); }}
-                      />
-                    </ToggleCell>
-                  )
-                }
-                {
-                  <TableCell>
-                    <StyledCompanyName
+                  <SelectableTableCell
+                    $selectable={chartCompanies}
+                    {...chartCompanies && {
+                      onClick: handleSelectableCellClick
+                    }}
+                  >
+                    <ColoredCompanyName
                       variant="span"
                       $color={entityColors[idx % entityColors.length]}
-                      onClick={(e) => { e.stopPropagation(); onToggleRow(companyName); }}
                     >
                       {companyName}
-                    </StyledCompanyName>
-                  </TableCell>
+                    </ColoredCompanyName>
+                  </SelectableTableCell>
                 }
                 {
                   cells.map((cell, idx) => (
@@ -146,7 +146,7 @@ const FundView = ({
                     </TableCell>
                   ))
                 }
-              </TableRow>
+              </FadedTableRow>
             );
           })
         }
