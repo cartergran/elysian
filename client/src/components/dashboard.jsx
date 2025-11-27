@@ -52,6 +52,7 @@ const Dashboard = () => {
   const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
   const [selectedColumn, setSelectedColumn] = useState(DEFAULT_COLUMN);
+  const [showSelectedOnly, setShowSelectedOnly] = useState(false);
 
   const FUNDS_BY_NAME = useMemo(() => (
     funds.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {})
@@ -156,6 +157,8 @@ const Dashboard = () => {
   const [hoveredEntity, setHoveredEntity] = useState(null);
   const [newEntities, setNewEntities] = useState(true);
   const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
+  const selectedSwitchDisabled =
+    selectedEntities.size === initialEntities.length  || selectedEntities.size === 0;
 
   const visibleEntities = useMemo(() => {
     if (!hoveredEntity) {
@@ -230,9 +233,12 @@ const Dashboard = () => {
   return (
     <StyledDashboard>
       <Header
+        chartCompanies={chartCompanies}
         fundName={fundName}
+        selectedSwitchDisabled={selectedSwitchDisabled}
         view={view}
         onCrumbClick={handleCrumbClick}
+        onSelectedSwitchChange={(e) => setShowSelectedOnly(e.target.checked)}
         onSwitchChange={(e) => setChartCompanies(e.target.checked)}
       />
       <Chart
@@ -240,6 +246,7 @@ const Dashboard = () => {
         dataLabel={selectedColumn.title}
         newEntities={newEntities}
         selectedEntities={selectedEntities}
+        showSelectedOnly={showSelectedOnly}
         visibleEntities={visibleEntities}
       />
       <Filter

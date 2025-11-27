@@ -14,12 +14,6 @@ import { useTheme } from '@mui/material/styles';
 import Switch from './switch';
 import Upload from './upload';
 
-const StyledToolBar = styled(Toolbar)`
-  justify-content: space-between;
-
-  padding: 0;
-`;
-
 const StyledBreadcrumbs = styled.div`
   display: flex;
   align-items: center;
@@ -46,9 +40,23 @@ const StyledCrumbLink = styled(Link)`
   }
 `;
 
+const StyledToolBar = styled(Toolbar)`
+  justify-content: space-between;
+
+  padding: 0;
+`;
+
 const HOME_TITLE = 'Overview';
 
-const Header = ({ fundName, view, onCrumbClick, onSwitchChange }) => {
+const Header = ({
+  chartCompanies,
+  fundName,
+  selectedSwitchDisabled,
+  view,
+  onCrumbClick,
+  onSwitchChange,
+  onSelectedSwitchChange
+}) => {
   const theme = useTheme();
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -88,6 +96,14 @@ const Header = ({ fundName, view, onCrumbClick, onSwitchChange }) => {
         </StyledBreadcrumbs>
         <Stack alignItems="center" direction="row" gap={1}>
           { view.mode === 'FUND' && <Switch label="Companies" onChange={onSwitchChange} /> }
+          {
+            chartCompanies &&
+              <Switch
+                disabled={selectedSwitchDisabled}
+                label="Selected"
+                onChange={onSelectedSwitchChange}
+              />
+          }
           <Upload fundName={fundName} />
         </Stack>
       </StyledToolBar>

@@ -133,6 +133,7 @@ const Chart = ({
   dataLabel = 'Total Value',
   newEntities,
   selectedEntities,
+  showSelectedOnly = false,
   visibleEntities
 }) => {
   const theme = useTheme();
@@ -194,6 +195,8 @@ const Chart = ({
 
         {
           entityNames.map((entityName, idx) => {
+            if (showSelectedOnly && !visibleEntities.has(entityName)) { return null; }
+
             const isVisible = visibleEntities.has(entityName);
             const showDetails = canShowDetails && isVisible;
 

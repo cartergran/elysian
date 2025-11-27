@@ -8,19 +8,24 @@ import {
 import styled from 'styled-components';
 
 const StyledSwitch = styled(Stack)`
-  & .MuiSwitch-root .MuiSwitch-track {
+  & .MuiSwitch-root {
+    cursor: ${({ $disabled }) => $disabled ? 'not-allowed' : 'pointer'} !important;
+  }
+
+  & .MuiSwitch-track {
     background-color: ${({ theme }) => theme.palette.secondary.main};
   }
 `;
 
-const Switch = ({ label, onChange }) => {
+const Switch = ({ disabled = false, label, onChange }) => {
   const theme = useTheme();
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
   return (
-    <StyledSwitch direction="row" alignItems="center">
+    <StyledSwitch direction="row" alignItems="center" $disabled={disabled}>
       <MUISwitch
         color="secondary"
+        disabled={disabled}
         size={isLargeViewport ? 'large' : 'small'}
         onChange={onChange}
       />
