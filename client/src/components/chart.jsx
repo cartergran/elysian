@@ -139,6 +139,8 @@ const Chart = ({
   const isLargeViewport = useMediaQuery(theme.breakpoints.up('md'));
 
   const canShowDetails = selectedEntities.size <= MAX_ENTITIES_FOR_DETAILS;
+  const canShowTooltip = canShowDetails && selectedEntities.size > 0;
+
   const { entityNames, dataPointsPerPeriod } = chartData;
   const firstPeriod = dataPointsPerPeriod.at(0)?.period;
   const lastPeriod = dataPointsPerPeriod.at(-1)?.period;
@@ -161,12 +163,12 @@ const Chart = ({
   }, [isLargeViewport, theme]);
 
   const tooltipContent = useMemo(() => (
-    canShowDetails ?
+    canShowTooltip ?
       <SelectedEntitiesTooltip
         dataLabel={dataLabel}
         selectedEntities={selectedEntities}
       /> : () => null
-  ), [canShowDetails, dataLabel, selectedEntities]);
+  ), [canShowTooltip, dataLabel, selectedEntities]);
 
   const tooltipWrapperStyle = useMemo(() => ({
     pointerEvents: 'none'
