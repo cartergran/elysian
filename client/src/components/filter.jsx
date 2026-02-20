@@ -7,7 +7,7 @@ const StyledFilter = styled.div`
 `;
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-  gap: 'var(--space-xl)',
+  gap: theme.spacing(4),
   [`& .${toggleButtonGroupClasses.firstButton}, & .${toggleButtonGroupClasses.middleButton}`]:
     {
       borderTopRightRadius: theme.shape.borderRadius,
@@ -17,32 +17,42 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     {
       borderTopLeftRadius: theme.shape.borderRadius,
       borderBottomLeftRadius: theme.shape.borderRadius,
-      borderLeft: `1px solid ${theme.palette.secondary.main}`,
+      borderLeft: `${theme.shape.borderWidth}px solid ${theme.palette.secondary.main}`,
     },
   [`
     & .${toggleButtonGroupClasses.lastButton}.${toggleButtonClasses.disabled},
     & .${toggleButtonGroupClasses.middleButton}.${toggleButtonClasses.disabled}`
   ]:
     {
-      borderLeft: `1px solid ${theme.palette.action.disabled}`,
+      borderLeft: `${theme.shape.borderWidth}px solid ${theme.palette.action.disabled}`,
     },
 }));
 
-const Filter = ({ filters, selectedFilter, onFilterChange }) => {
+const StyledToggleButton = styled(ToggleButton)`
+  font-size: ${({ theme }) => theme.typography.body2.fontSize};
+  padding: ${({ theme }) => theme.spacing(0.75)};
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    font-size: ${({ theme }) => theme.typography.body1.fontSize};
+    padding: ${({ theme }) => theme.spacing(1)};
+  }
+`;
+
+const Filter = ({ options, selected, onChange }) => {
   return (
     <StyledFilter>
       <StyledToggleButtonGroup
-        value={selectedFilter}
-        onChange={(_e, value) => onFilterChange(value)}
+        value={selected}
+        onChange={(e) => onChange(Number(e.target.value))}
         exclusive
       >
         {
-          // value := # of quarters + 1 (i.e. 1Y = 5)
+          // period := # of quarters + 1 (i.e. 1Y = 5)
           // +1 bc 5 records shows the price over 4Q
-          Object.entries(filters).map(([term, value]) => (
-            <ToggleButton key={term} value={value}>
-              {term}
-            </ToggleButton>
+          options.map(({ label, period }) => (
+            <StyledToggleButton key={label} value={period}>
+              {label}
+            </StyledToggleButton>
           ))
         }
       </StyledToggleButtonGroup>

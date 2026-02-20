@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material';
+import { alpha, createTheme } from '@mui/material/styles';
 import { css } from 'styled-components';
 
 const muiTheme = createTheme({
@@ -12,17 +12,43 @@ const muiTheme = createTheme({
       light: '#FED76D'
     },
     text: {
-      primary: '#FDB927'
+      primary: '#FED76D',
+      secondary: '#552583'
     },
     action: {
-      disabled: '#A0A0A0'
+      disabled: '#A0A0A0',
+      highlighted: '#2A2A2A',
+      hover: alpha('#552583', 0.14)
+    },
+    entities: [
+      '#aec7e8',
+      '#ffbb78',
+      '#98df8a',
+      '#ff9896',
+      '#c5b0d5',
+      '#c49c94',
+      '#f7b6d2',
+      '#c7c7c7',
+      '#dbdb8d',
+      '#9edae5'
+    ]
+  },
+  chart: {
+    activeDot: {
+      radiusDetailed: 6
+    },
+    line: {
+      opacityUnselected: 0.25,
+      widthDetailed: 2
     }
   },
-  typography: {
-    fontFamily: 'Roboto'
-  },
   shape: {
+    borderWidth: 1,
     borderRadius: 8
+  },
+  spacing: 8,
+  typography: {
+    fontFamily: 'Roboto Mono, monospace'
   }
 });
 
@@ -32,7 +58,7 @@ const extendedMuiTheme = createTheme(muiTheme, {
       styleOverrides: {
         root: {
           borderColor: muiTheme.palette.secondary.main,
-          borderWidth: 2,
+          borderWidth: muiTheme.shape.borderWidth,
           borderRadius: muiTheme.shape.borderRadius,
           color: muiTheme.palette.secondary.main,
           '&:hover': {
@@ -55,6 +81,13 @@ const extendedMuiTheme = createTheme(muiTheme, {
             fontWeight: 700,
             letterSpacing: '0.5px'
           }
+        }
+      }
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: muiTheme.palette.primary.light,
         }
       }
     }

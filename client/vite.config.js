@@ -9,4 +9,12 @@ export default defineConfig({
       '@mui/styled-engine': '@mui/styled-engine-sc',
     }
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true
+      }
+    }
+  }
 });

@@ -1,83 +1,263 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+
 import Chart from './chart';
 import Filter from './filter';
-import Portfolio from './portfolio'
+import Header from './header';
+import Portfolio from './portfolio';
 
-import fundA from '../reports/nexacoreGrowthEquityFund.json';
-import fundB from '../reports/polarisFutureVenturesFund.json';
-import fundC from '../reports/vertexEdgeOpportunityFund.json';
+import { slugify, deslugify } from '../utils/helpers';
+import { toChartData } from '../utils/investments';
+import { useFunds } from '../hooks/funds';
+
+// TODO: tmp
+// import fundA from '../reports/blueOrbitCapitalFund.json';
+// import fundB from '../reports/fractalHorizonVenturesFund.json';
+// import fundC from '../reports/pinnacleAscendFund.json';
+// const funds = [fundA, fundB, fundC];
 
 const StyledDashboard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-m);
+  gap: ${({ theme }) => theme.spacing(2)};
 
   width: 100%;
 
-  padding: var(--space-xl);
+  padding: ${({ theme }) => theme.spacing(4)};
 `;
 
-const filters = {
-  '1Q': 2,
-  '2Q': 3,
-  '1Y': 5,
-  '2Y': 9
+const DEFAULT_COLUMN = {
+  idx: 1,
+  title: 'Total Value',
+  dataPoint: 'totalValue'
 };
 
-const funds = [
-  fundA,
-  fundB,
-  fundC
+const FILTERS = [
+  { label: '1Q', period: 1 },
+  { label: '2Q', period: 2 },
+  { label: '1Y', period: 4 },
+  { label: '2Y', period: 8 },
+  { label: 'ALL', period: Infinity }
 ];
+const lastPeriod = (p, arr) => p === Infinity ? arr : arr.slice(-(p + 1));
 
 const Dashboard = () => {
-  const [view, setView] = useState(0);
-  const [selectedFund, setSelectedFund] = useState(0);
-  const [selectedFilter, setSelectedFilter] = useState(null);
+  const { fundSlug, companySlug } = useParams();
+  const nav = useNavigate();
+  // TODO: loading, isError, error
+  const { data: funds = [], isLoading: loading, isError, error } = useFunds();
 
+  const [chartCompanies, setChartCompanies] = useState(false);
+  const [filterPeriod, setFilterPeriod] = useState(Infinity);
+  const [selectedColumn, setSelectedColumn] = useState(DEFAULT_COLUMN);
+  const [showSelectedOnly, setShowSelectedOnly] = useState(false);
+
+  const FUNDS_BY_NAME = useMemo(() => (
+    funds.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {})
+  ), [funds]);
+
+  const fundName = fundSlug ? deslugify(fundSlug, funds) : null;
+  const fund = fundName ? FUNDS_BY_NAME[fundName] : null;
+  const companyName = companySlug && fund ? deslugify(companySlug, funds, fund) : null;
+
+  const view = useMemo(() => {
+    if (fundName && companyName) {
+      return { mode: 'COMPANY', params: { fundName, companyName } };
+    }
+    if (fundName) {
+      return { entityName: 'company', mode: 'FUND', params: { fundName } }
+    };
+    return { entityName: 'fund', mode: 'HOME', params: {} };
+  }, [fundName, companyName]);
+
+  const goHome = () => nav('/');
+  const goFund = (f) => nav(`/fund/${slugify(f)}`);
+  const goCompany = (f, c) => nav(`/fund/${slugify(f)}/company/${slugify(c)}`);
+  const navByIdx = {
+    0: goHome,
+    1: goFund,
+    2: goCompany
+  };
+
+  /*
+    toChartData() := {
+      entityNames: [
+        [entityNameA],
+        [entityNameB],
+        ...
+      ],
+      totalValuesByPeriod: [
+        {
+          period: [periodOne],
+          [entityNameA]: totalValueA,
+          [entityNameB]: totalValueB,
+          ...
+        },
+        {
+          period: [periodTwo],
+          [entityNameA]: totalValueA,
+          [entityNameB]: totalValueB,
+          ...
+        },
+        ...
+      ]
+    }
+  */
   const chartData = useMemo(() => {
-    let res = [];
-    if (selectedFund != null && selectedFilter != null) {
-      res = funds[selectedFund].summary.investmentRounds.slice(-selectedFilter);
-    } else if (selectedFund != null) {
-      res = funds[selectedFund].summary.investmentRounds;
-    } else if (selectedFilter != null) {
-      res = funds.map(({ summary }) => ({ summary: summary.slice(-selectedFilter) }));
+    let retVal = {};
+    if (view.mode === 'FUND') {
+      // fund view
+      retVal = chartCompanies
+        ? fund.investments.reduce((acc, i) => {
+            acc[i.companyName] = lastPeriod(filterPeriod, i.investmentRounds);
+            return acc;
+          }, {})
+        : { [fund.fundName]: lastPeriod(filterPeriod, fund.investmentRoundsSummary) };
     } else {
-      res = funds.map(({ summary }) => ({ summary }));
+      // home view
+      retVal = funds.reduce((acc, f) => {
+        acc[f.fundName] = lastPeriod(filterPeriod, f.investmentRoundsSummary);
+        return acc;
+      }, {});
     }
-    return res;
-  }, [selectedFund, selectedFilter]);
 
+    return toChartData(retVal, selectedColumn.dataPoint);
+  }, [chartCompanies, filterPeriod, fund, funds, selectedColumn, view]);
+
+  /*
+    portfolioData := [
+      {
+        company: [companyA],
+        investmentRounds: {...}
+      },
+      {
+        company: [companyB],
+        investmentRounds: {...}
+      },
+      ...
+    ]
+  */
   const portfolioData = useMemo(() => {
-    let res = [];
-    if (selectedFund != null) {
-      res = funds[selectedFund].investments;
+    let retVal = [];
+    if (view.mode === 'FUND') {
+      retVal = fund.investments;
     } else {
-      res = funds.map(({ summary }) => ({ summary }));
+      retVal = funds.map(({ fundName, investmentRoundsSummary }) => ({
+        fundName,
+        investmentRoundsSummary
+      }));
     }
-    return res;
-  }, [selectedFund, selectedFilter]);
+
+    return retVal;
+  }, [fund, funds, view]);
+
+  const initialEntities = useMemo(() => chartData.entityNames, [chartData]);
+  const [hoveredEntity, setHoveredEntity] = useState(null);
+  const [newEntities, setNewEntities] = useState(true);
+  const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
+  const selectedSwitchDisabled =
+    selectedEntities.size === initialEntities.length  || selectedEntities.size === 0;
+
+  const visibleEntities = useMemo(() => {
+    if (!hoveredEntity) {
+      return selectedEntities;
+    }
+    const next = new Set(selectedEntities);
+    next.add(hoveredEntity);
+    return next;
+  }, [hoveredEntity, selectedEntities]);
+
+  useEffect(() => {
+    setSelectedEntities(new Set(initialEntities));
+    setNewEntities(true);
+  }, [initialEntities]);
+
+  const handleCrumbClick = useCallback((idx) => {
+    setChartCompanies(false);
+    setSelectedColumn(DEFAULT_COLUMN);
+    navByIdx[idx]();
+  }, [navByIdx]);
+
+  const handleFundNameClick = useCallback((fundName) => {
+    setSelectedColumn(DEFAULT_COLUMN);
+    goFund(fundName);
+  }, [goFund]);
+
+  const handleToggleRow = useCallback((entityName) => {
+    setSelectedEntities(prev => {
+      const next = new Set(prev);
+      next.has(entityName) ? next.delete(entityName) : next.add(entityName);
+      return next;
+    });
+    setNewEntities(false);
+  }, []);
+
+  const handleToggleRows = useCallback((entityNames) => {
+    setSelectedEntities((prev) => {
+      return prev.size === entityNames.length ? new Set() : new Set(entityNames)
+    });
+    setNewEntities(false);
+  }, []);
+
+  // TODO: contracts.ts --> useMemo<PortfolioModel>(...)
+  const model = useMemo(() => ({
+    chartCompanies,
+    filterPeriod,
+    portfolioData,
+    selectedColumn,
+    selectedEntities,
+    visibleEntities
+  }), [
+    chartCompanies,
+    filterPeriod,
+    portfolioData,
+    selectedColumn,
+    selectedEntities,
+    visibleEntities
+  ]);
+
+  const controller = useMemo(() => ({
+    onColumnHeaderClick: setSelectedColumn,
+    onFundNameClick: handleFundNameClick,
+    onHoverRow: setHoveredEntity,
+    onToggleRow: handleToggleRow,
+    onToggleRows: handleToggleRows
+  }), [
+    handleFundNameClick,
+    handleToggleRow,
+    handleToggleRows
+  ]);
 
   return (
     <StyledDashboard>
+      <Header
+        chartCompanies={chartCompanies}
+        fundName={fundName}
+        selectedSwitchDisabled={selectedSwitchDisabled}
+        view={view}
+        onCrumbClick={handleCrumbClick}
+        onSelectedSwitchChange={(e) => setShowSelectedOnly(e.target.checked)}
+        onSwitchChange={(e) => setChartCompanies(e.target.checked)}
+      />
       <Chart
         chartData={chartData}
-        selectedFilter={selectedFilter}
+        dataLabel={selectedColumn.title}
+        newEntities={newEntities}
+        selectedEntities={selectedEntities}
+        showSelectedOnly={showSelectedOnly}
+        visibleEntities={visibleEntities}
       />
       <Filter
-        filters={filters}
-        selectedFilter={selectedFilter}
-        onFilterChange={setSelectedFilter}
+        options={FILTERS}
+        selected={filterPeriod}
+        onChange={setFilterPeriod}
       />
       <Portfolio
+        model={model}
         view={view}
-        portfolioData={portfolioData}
-        selectedFund={selectedFund}
-        selectedFilter={selectedFilter}
-        onFundChange={setSelectedFund}
+        controller={controller}
       />
     </StyledDashboard>
   );
