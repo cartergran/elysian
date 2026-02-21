@@ -6,11 +6,11 @@ import path from 'path';
 
 import authMiddleware from './middleware/auth.js';
 import authRouter from './routes/auth.js';
-import callAndParseAnthropic from './services/model.js';
-import getFunds from './services/query.js';
+// import callAndParseAnthropic from './services/model.js';
+// import getFunds from './services/query.js';
 import { MESSAGES } from './constants/messages.js';
-import putPdfAndGetUrlFromS3 from './services/bucket.js';
-import upsertFund from './services/upsert.js';
+// import putPdfAndGetUrlFromS3 from './services/bucket.js';
+// import upsertFund from './services/upsert.js';
 
 const PORT = process.env.PORT || 3001;
 
@@ -51,15 +51,15 @@ app.post('/api/extract', authMiddleware, upload.single('file'), async (req, res)
     const filename = req.file.originalname;
     console.log('filename:', filename);
 
-    const signedUrl = await putPdfAndGetUrlFromS3(req.file.buffer, filename);
-    const { period, investments } = await callAndParseAnthropic(signedUrl);
-    const payload = {
-      fundName,
-      period,
-      investments,
-    };
+    // const signedUrl = await putPdfAndGetUrlFromS3(req.file.buffer, filename);
+    // const { period, investments } = await callAndParseAnthropic(signedUrl);
+    // const payload = {
+    //   fundName,
+    //   period,
+    //   investments,
+    // };
     // console.log('payload:', payload);
-    await upsertFund(payload);
+    // await upsertFund(payload);
 
     /*
     const fileBuffer = req.file.buffer;

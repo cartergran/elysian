@@ -9,7 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/auth';
 import Dashboard from './components/dashboard';
 import Layout from './components/layout';
-import Login from './components/Login';
+import Login from './components/login';
 
 const queryClient = new QueryClient({
   defaultOptions: {

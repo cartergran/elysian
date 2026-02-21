@@ -12,10 +12,10 @@ import { toChartData } from '../utils/investments';
 import { useFunds } from '../hooks/funds';
 
 // TODO: tmp
-// import fundA from '../reports/blueOrbitCapitalFund.json';
-// import fundB from '../reports/fractalHorizonVenturesFund.json';
-// import fundC from '../reports/pinnacleAscendFund.json';
-// const funds = [fundA, fundB, fundC];
+import fundA from '../reports/blueOrbitCapitalFund.json';
+import fundB from '../reports/fractalHorizonVenturesFund.json';
+import fundC from '../reports/pinnacleAscendFund.json';
+const funds = [fundA, fundB, fundC];
 
 const StyledDashboard = styled.div`
   display: flex;
@@ -47,7 +47,7 @@ const Dashboard = () => {
   const { fundSlug, companySlug } = useParams();
   const nav = useNavigate();
   // TODO: loading, isError, error
-  const { data: funds = [], isLoading: loading, isError, error } = useFunds();
+  // const { data: funds = [], isLoading: loading, isError, error } = useFunds();
 
   const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
