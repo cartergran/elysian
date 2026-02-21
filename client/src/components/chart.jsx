@@ -6,9 +6,9 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { Typography, useMediaQuery } from '@mui/material';
-import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 
 import { useLineAnimationOnAdd } from '../hooks/lines';
@@ -25,9 +25,9 @@ const StyledTooltip = styled.div`
   flex-direction: column;
   align-items: center;
 
-  background: white;
+  background: ${({ theme }) => theme.palette.background.paper};
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
-  color: black;
+  color: ${({ theme }) => theme.palette.text.primary};
   padding: ${({ theme }) => theme.spacing(1)};
 `;
 
@@ -66,6 +66,9 @@ const Axes = memo(({
   tickFontSize,
   tickDelta
 }) => {
+  const theme = useTheme();
+  const strokeColor = theme.palette.primary.main;
+
   const xTickProps = useMemo(() => ({
     dy: tickDelta,
     fontSize: tickFontSize
@@ -85,7 +88,7 @@ const Axes = memo(({
       <XAxis
         dataKey="period"
         // interval="preserveStartEnd"
-        stroke="white"
+        stroke={strokeColor}
         tick={xTickProps}
         tickFormatter={periodTickFormatter}
         ticks={ticks}
@@ -93,7 +96,7 @@ const Axes = memo(({
       <YAxis
         tick={yTickProps}
         tickFormatter={(val) => `$${val}`}
-        stroke="white"
+        stroke={strokeColor}
       />
     </>
   );

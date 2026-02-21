@@ -48,6 +48,7 @@ const FundView = ({
   onToggleRows,
 }) => {
   const theme = useTheme();
+  const entityColors = theme.palette.entities;
 
   const rows = useMemo(() => portfolioData.map(({ companyName, investmentRounds }) => {
     let currentInvestment = investmentRounds.at(-1);
@@ -65,7 +66,6 @@ const FundView = ({
     };
   }), [portfolioData, filterPeriod]);
 
-  const entityColors = theme.palette.entities || [];
   const companyEntities = useMemo(() => rows.map((r) => r.companyName), [rows]);
   const handleSelectableHeaderClick = (e) => {
     e.stopPropagation();

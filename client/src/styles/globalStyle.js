@@ -13,7 +13,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background-color: black;
+    background-color: ${({ theme }) => theme.palette.background.default};
     padding: 0;
   }
 

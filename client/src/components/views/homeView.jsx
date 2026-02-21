@@ -5,9 +5,15 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
+import styled from 'styled-components';
 import { useMemo } from 'react';
+import { useTheme } from '@mui/material/styles';
 
 import { formatCurrency, getReturnPercent } from '../../utils/investments';
+
+const ColoredFundName = styled(Link)`
+  color: ${({ $color }) => $color};
+`;
 
 const HomeView = ({
   columnHeadersByDataPoint,
@@ -20,6 +26,9 @@ const HomeView = ({
   onColumnHeaderClick,
   onFundNameClick
 }) => {
+  const theme = useTheme();
+  const entityColors = theme.palette.entities;
+
   const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }) => {
     let currentInvestment = investmentRoundsSummary.at(-1);
     let returnPercent = getReturnPercent(
@@ -69,11 +78,17 @@ const HomeView = ({
             realizedValue,
             unrealizedValue,
             returnPercent
-        }) => {
-            let cells = [
-              <Link component="button" underline="hover" onClick={() => onFundNameClick(fundName)}>
+          }, idx) => {
+            const cells = [
+              <ColoredFundName
+                key={fundName}
+                component="button"
+                underline="hover"
+                $color={entityColors[idx % entityColors.length]}
+                onClick={() => onFundNameClick(fundName)}
+              >
                 {fundName}
-              </Link>,
+              </ColoredFundName>,
               formatCurrency(totalValue),
               formatCurrency(investedCapital),
               formatCurrency(realizedValue),

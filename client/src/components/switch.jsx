@@ -6,16 +6,23 @@ import {
   useTheme
 } from '@mui/material';
 import styled from 'styled-components';
+import { switchClasses } from '@mui/material/Switch';
 
 const StyledSwitch = styled(Stack)`
-  & .MuiSwitch-root {
+  & .${switchClasses.root} {
     cursor: ${({ $disabled }) => $disabled ? 'not-allowed' : 'pointer'} !important;
   }
-
-  & .MuiSwitch-track {
-    background-color: ${({ theme }) => theme.palette.secondary.main};
-  }
 `;
+
+const switchSx = {
+  color: 'primary.light',
+  [`& .${switchClasses.switchBase}.${switchClasses.checked}`]: {
+    color: 'primary.light',
+  },
+  [`& .${switchClasses.switchBase}.${switchClasses.checked} + .${switchClasses.track}`]: {
+    backgroundColor: 'primary.light',
+  },
+};
 
 const Switch = ({ disabled = false, label, onChange }) => {
   const theme = useTheme();
@@ -24,9 +31,9 @@ const Switch = ({ disabled = false, label, onChange }) => {
   return (
     <StyledSwitch direction="row" alignItems="center" $disabled={disabled}>
       <MUISwitch
-        color="secondary"
         disabled={disabled}
         size={isLargeViewport ? 'large' : 'small'}
+        sx={switchSx}
         onChange={onChange}
       />
       { isLargeViewport && <Typography variant='body1'>{label}</Typography> }

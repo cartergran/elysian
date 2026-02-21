@@ -15,8 +15,8 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { useRef, useState } from 'react';
 import styled from 'styled-components';
+import { useRef, useState } from 'react';
 
 import { useUploadFund } from '../hooks/funds';
 
@@ -195,7 +195,7 @@ const Upload = ({ fundName: initialFundName }) => {
 
   return (
     <>
-      <IconButton color="secondary" onClick={() => setOpen(true)}>
+      <IconButton sx={{ color: 'primary.light' }} onClick={() => setOpen(true)}>
         <StyledUploadIcon />
       </IconButton>
 

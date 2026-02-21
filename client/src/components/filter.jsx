@@ -13,19 +13,15 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
       borderTopRightRadius: theme.shape.borderRadius,
       borderBottomRightRadius: theme.shape.borderRadius,
     },
-  [`& .${toggleButtonGroupClasses.lastButton}, & .${toggleButtonGroupClasses.middleButton}`]:
+  [`& .${toggleButtonGroupClasses.middleButton}, & .${toggleButtonGroupClasses.lastButton}`]:
     {
       borderTopLeftRadius: theme.shape.borderRadius,
       borderBottomLeftRadius: theme.shape.borderRadius,
-      borderLeft: `${theme.shape.borderWidth}px solid ${theme.palette.secondary.main}`,
+      borderLeft: `${theme.shape.borderWidth}px solid ${theme.palette.divider}`
     },
-  [`
-    & .${toggleButtonGroupClasses.lastButton}.${toggleButtonClasses.disabled},
-    & .${toggleButtonGroupClasses.middleButton}.${toggleButtonClasses.disabled}`
-  ]:
-    {
-      borderLeft: `${theme.shape.borderWidth}px solid ${theme.palette.action.disabled}`,
-    },
+  [`& .${toggleButtonClasses.selected}`]: {
+    borderLeftColor: theme.palette.primary.main
+  }
 }));
 
 const StyledToggleButton = styled(ToggleButton)`

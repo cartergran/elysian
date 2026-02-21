@@ -12,7 +12,7 @@ const FilterHeaderCell = styled(TableCell)`
   color:
     ${({ theme, $selected  }) => $selected
       ? theme.palette.primary.light
-      : theme.palette.secondary.main
+      : theme.palette.text.primary
     };
   font-size:
     ${({ theme, $selected  }) => $selected
