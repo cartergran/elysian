@@ -4,8 +4,11 @@ import { fileURLToPath } from 'url';
 import multer from 'multer';
 import path from 'path';
 
+import authMiddleware from './middleware/auth.js';
+import authRouter from './routes/auth.js';
 import callAndParseAnthropic from './services/model.js';
 import getFunds from './services/query.js';
+import { MESSAGES } from './constants/messages.js';
 import putPdfAndGetUrlFromS3 from './services/bucket.js';
 import upsertFund from './services/upsert.js';
 
@@ -16,6 +19,10 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.use(express.json());
+
+app.use('/api/auth', authRouter);
+
 const upload = multer({
   limits: {
     fileSize: 32 * 1024 * 1024 // 32MB
@@ -24,21 +31,21 @@ const upload = multer({
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (ext !== '.pdf') {
-      return cb(new Error('Only PDF files are allowed.'), false);
+      return cb(new Error(MESSAGES.ONLY_PDF_ALLOWED), false);
     }
     cb(null, true);
   }
 });
 
-app.post('/api/extract', upload.single('file'), async (req, res) => {
+app.post('/api/extract', authMiddleware, upload.single('file'), async (req, res) => {
   try {
     const file = req.file;
     const fundName = req.body.fundName;
     if (!file) {
-      return res.status(400).json({ detail: 'No file uploaded.' });
+      return res.status(400).json({ detail: MESSAGES.NO_FILE_UPLOADED });
     }
     if (!fundName) {
-      return res.status(400).json({ detail: 'No fund name entered.'})
+      return res.status(400).json({ detail: MESSAGES.NO_FUND_NAME_ENTERED });
     }
 
     const filename = req.file.originalname;
@@ -67,7 +74,7 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
     */
 
     res.json({
-      message: 'Report processed successfully',
+      message: MESSAGES.REPORT_PROCESSED_SUCCESS,
       size: file.size
     });
 
@@ -78,7 +85,7 @@ app.post('/api/extract', upload.single('file'), async (req, res) => {
   }
 });
 
-app.get('/api/funds', async (_req, res) => {
+app.get('/api/funds', authMiddleware, async (_req, res) => {
   try {
     const funds = await getFunds();
     res.json(funds);
@@ -93,7 +100,7 @@ app.get('/api/funds', async (_req, res) => {
 app.use((err, _req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ detail: 'File size exceeds 32MB limit.' });
+      return res.status(400).json({ detail: MESSAGES.FILE_SIZE_EXCEEDED });
     }
     return res.status(400).json({ detail: err.message });
   }
