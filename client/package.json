@@ -1,11 +1,12 @@
 {
   "name": "client",
-  "version": "0.1",
+  "version": "0.2",
   "private": true,
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

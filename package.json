@@ -1,6 +1,6 @@
 {
-  "name": "tbd",
-  "version": "0.1",
+  "name": "elysian",
+  "version": "0.2",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cartergran/tbd.git"
+    "url": "git+https://github.com/cartergran/elysian.git"
   },
   "engines": {
     "node": ">=22 <23"
