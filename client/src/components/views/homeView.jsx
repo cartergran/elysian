@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
-import { formatCurrency, getReturnPercent } from '../../utils/investments';
+import { formatCurrency, calcReturnPercent } from '../../utils/investments';
 
 const ColoredFundName = styled(Link)`
   color: ${({ $color }) => $color};
@@ -30,11 +30,10 @@ const HomeView = ({
   const entityColors = theme.palette.entities;
 
   const rows = useMemo(() => portfolioData.map(({ fundName, investmentRoundsSummary }) => {
-    let currentInvestment = investmentRoundsSummary.at(-1);
-    let returnPercent = getReturnPercent(
-      currentInvestment,
-      investmentRoundsSummary,
-      filterPeriod
+    const currentInvestment = investmentRoundsSummary.at(-1);
+    const returnPercent = calcReturnPercent(
+      currentInvestment.totalValue,
+      currentInvestment.investedCapital
     );
 
     return {
