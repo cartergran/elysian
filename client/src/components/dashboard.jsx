@@ -153,10 +153,23 @@ const Dashboard = () => {
     return retVal;
   }, [fund, funds, view]);
 
-  const initialEntities = useMemo(() => chartData.entityNames, [chartData]);
+  // entity list for selection
+  const initialEntities = useMemo(() => {
+    let retVal = [];
+    if (view.mode === 'FUND') {
+      if (fund) {
+        retVal = chartCompanies ? fund.investments.map((i) => i.companyName) : [fund.fundName];
+      }
+    } else {
+      retVal = funds.map((f) => f.fundName);
+    }
+
+    return retVal;
+  }, [chartCompanies, fund, funds, view]);
+
   const [hoveredEntity, setHoveredEntity] = useState(null);
   const [newEntities, setNewEntities] = useState(true);
-  const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
+  const [selectedEntities, setSelectedEntities] = useState(() => new Set(initialEntities));
   const selectedSwitchDisabled =
     selectedEntities.size === initialEntities.length  || selectedEntities.size === 0;
 
