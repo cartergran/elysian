@@ -20,6 +20,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// trust heroku proxy for rate limit
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(securityMiddleware());
 app.use('/api/auth', authRouter);
