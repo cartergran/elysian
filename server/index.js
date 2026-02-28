@@ -10,6 +10,7 @@ import callAndParseAnthropic from './services/model.js';
 import getFunds from './services/query.js';
 import { MESSAGES } from './constants/messages.js';
 import putPdfAndGetUrlFromS3 from './services/bucket.js';
+import { securityMiddleware } from './middleware/security.js';
 import upsertFund from './services/upsert.js';
 
 const PORT = process.env.PORT || 3001;
@@ -20,7 +21,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(express.json());
-
+app.use(securityMiddleware());
 app.use('/api/auth', authRouter);
 
 const upload = multer({
@@ -108,12 +109,23 @@ app.use((err, _req, res, next) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
+  const clientDist = path.resolve(__dirname, '../client/dist');
   // serve static react files
-  app.use(express.static(path.join(__dirname, '../client/dist')));
+  app.use(
+    express.static(clientDist, {
+      dotfiles: 'ignore',
+      index: false
+    })
+  );
 
-  // catch all handler
-  app.get('/*splat', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+ // serve index.html only for routes without a file extension
+  app.get(/^\/(?!.*\.[a-z0-9]+$).*/i, (_req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+
+  // 404 fallback for other routes
+  app.use((_req, res) => {
+    res.sendStatus(404);
   });
 }
 
