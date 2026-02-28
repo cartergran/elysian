@@ -28,8 +28,8 @@ const StyledDashboard = styled.div`
   padding: ${({ theme }) => theme.spacing(4)};
 `;
 
-const DEFAULT_COLUMN = {
-  idx: 1,
+const DEFAULT_SELECTED_COLUMN = {
+  idx: 0,
   title: 'Total Value',
   dataPoint: 'totalValue'
 };
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
-  const [selectedColumn, setSelectedColumn] = useState(DEFAULT_COLUMN);
+  const [selectedColumn, setSelectedColumn] = useState(DEFAULT_SELECTED_COLUMN);
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
 
   const FUNDS_BY_NAME = useMemo(() => (
@@ -176,12 +176,12 @@ const Dashboard = () => {
 
   const handleCrumbClick = useCallback((idx) => {
     setChartCompanies(false);
-    setSelectedColumn(DEFAULT_COLUMN);
+    setSelectedColumn(DEFAULT_SELECTED_COLUMN);
     navByIdx[idx]();
   }, [navByIdx]);
 
   const handleFundNameClick = useCallback((fundName) => {
-    setSelectedColumn(DEFAULT_COLUMN);
+    setSelectedColumn(DEFAULT_SELECTED_COLUMN);
     goFund(fundName);
   }, [goFund]);
 
