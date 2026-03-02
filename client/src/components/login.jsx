@@ -11,7 +11,7 @@ import api from '../utils/client';
 import { useAuth } from '../context/auth';
 
 const LOGIN_LABELS = {
-  wordmark: 'Elysian',
+  wordmark: 'Panorama',
   username: 'Username',
   password: 'Password',
   signIn: 'Sign In',

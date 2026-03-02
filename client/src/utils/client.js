@@ -23,7 +23,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // skip redirect loop for login endpoint itself
       if (!error.config?.url?.includes('/auth/login')) {
-        window.dispatchEvent(new Event('elysian:unauthorized'));
+        window.dispatchEvent(new Event('panorama:unauthorized'));
       }
     }
     return Promise.reject(error);

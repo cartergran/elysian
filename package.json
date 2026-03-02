@@ -1,5 +1,5 @@
 {
-  "name": "elysian",
+  "name": "panorama",
   "version": "0.2",
   "private": true,
   "license": "UNLICENSED",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cartergran/elysian.git"
+    "url": "git+https://github.com/cartergran/panorama.git"
   },
   "engines": {
     "node": ">=22 <23"

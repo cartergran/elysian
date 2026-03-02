@@ -2,7 +2,7 @@ import { createContext, useContext, useCallback, useEffect, useState } from 'rea
 
 import api from '../utils/client';
 
-export const SESSION_KEY = 'elysian_token';
+export const SESSION_KEY = 'panorama_token';
 
 const AuthContext = createContext(null);
 
@@ -29,8 +29,8 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.removeItem(SESSION_KEY);
       setToken(null);
     };
-    window.addEventListener('elysian:unauthorized', handleUnauthorized);
-    return () => window.removeEventListener('elysian:unauthorized', handleUnauthorized);
+    window.addEventListener('panorama:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('panorama:unauthorized', handleUnauthorized);
   }, []);
 
   return (
