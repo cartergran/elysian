@@ -27,9 +27,15 @@ const toChartData = (data, dataPoint = 'totalValue') => {
     });
   });
 
+  const byPeriod = (a, b) => {
+    const [ya, qa] = a.period.split('-Q').map(Number);
+    const [yb, qb] = b.period.split('-Q').map(Number);
+    return ya - yb || qa - qb;
+  };
+
   return {
     entityNames: Object.keys(data),
-    dataPointsPerPeriod: Array.from(periodMap.values())
+    dataPointsPerPeriod: Array.from(periodMap.values()).sort(byPeriod)
   };
 };
 
