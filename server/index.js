@@ -7,7 +7,7 @@ import path from 'path';
 import authMiddleware from './middleware/auth.js';
 import authRouter from './routes/auth.js';
 import callAndParseAnthropic from './services/model.js';
-import getFunds from './services/query.js';
+import getFunds, { CONNECTION_ERROR_CODES } from './services/query.js';
 import { MESSAGES } from './constants/messages.js';
 import putPdfAndGetUrlFromS3 from './services/bucket.js';
 import { securityMiddleware } from './middleware/security.js';
@@ -96,7 +96,14 @@ app.get('/api/funds', authMiddleware, async (_req, res) => {
   } catch(err) {
     const errDetail = `Error fetching funds: ${err.message}`;
     console.error(errDetail);
-    return res.status(500).json({ detail: errDetail });
+
+    const isConnectionError = CONNECTION_ERROR_CODES.has(err.code);
+    const status = isConnectionError ? 503 : 500;
+
+    return res.status(status).json({
+      detail: errDetail,
+      ...(isConnectionError && { error_type: 'DB_UNREACHABLE' })
+    });
   }
 });
 
