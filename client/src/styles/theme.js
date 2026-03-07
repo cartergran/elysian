@@ -76,6 +76,15 @@ const muiTheme = createTheme({
 
 const extendedMuiTheme = createTheme(muiTheme, {
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        // working in Chrome, Firefox, and Safari
+        '*': {
+          scrollbarColor: `${muiTheme.palette.secondary.light} transparent`,
+          scrollbarWidth: 'thin'
+        }
+      }
+    },
     MuiToggleButton: {
       styleOverrides: {
         root: {
