@@ -6,11 +6,11 @@ import {
   Stack,
   Toolbar
 } from "@mui/material";
-import ShowChartIcon from "@mui/icons-material/ShowChart";
 import styled from 'styled-components';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
+import Logo from './logo';
 import Switch from './switch';
 import Upload from './upload';
 
@@ -82,7 +82,7 @@ const Header = ({
       <StyledToolBar>
         <StyledBreadcrumbs>
           <IconButton sx={{ color: 'primary.light' }} onClick={() => onCrumbClick(0)}>{/* 0 := HOME */}
-            <ShowChartIcon />
+            <Logo alt="home" size={32} />
           </IconButton>
           <Breadcrumbs color="inherit" separator=">">
             {

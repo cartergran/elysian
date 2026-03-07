@@ -1,12 +1,15 @@
-import { useState } from 'react';
-import styled from 'styled-components';
-import Box from '@mui/material/Box';
+import Box, { boxClasses } from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useState } from 'react';
+import styled from 'styled-components';
+
+import Logo from './logo';
+
 import api from '../utils/client';
 import { useAuth } from '../context/auth';
 
@@ -36,13 +39,23 @@ const LoginCard = styled(Card)`
   max-width: 360px;
 `;
 
+const LoginBrand = styled.div`
+  ${({ theme }) => theme.recycle.flexCenter};
+  gap: ${({ theme }) => theme.spacing(1)};
+  margin-bottom: ${({ theme }) => theme.spacing(3)};
+
+  .${boxClasses.root} {
+    width: 60px;
+    height: 60px;
+  }
+`;
+
 const Wordmark = styled(Typography)`
   color: ${({ theme }) => theme.palette.primary.main};
   font-family: 'Roboto Mono', monospace;
   font-weight: 700;
   font-size: ${({ theme }) => theme.typography.h4.fontSize};
   letter-spacing: 0.1em;
-  margin-bottom: ${({ theme }) => theme.spacing(3)};
   text-align: center;
 `;
 
@@ -78,7 +91,10 @@ const Login = () => {
     <StyledLogin>
       <LoginCard elevation={2}>
         <CardContent sx={{ p: 4 }}>
-          <Wordmark>{LOGIN_LABELS.wordmark}</Wordmark>
+          <LoginBrand>
+            <Logo size={60} />
+            <Wordmark>{LOGIN_LABELS.wordmark}</Wordmark>
+          </LoginBrand>
           <Box
             component="form"
             display="flex"

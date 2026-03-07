@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Outer Circle -->
+  <circle cx="256" cy="256" r="210"
+          fill="none"
+          stroke="#2F80ED"
+          stroke-width="22"/>
+
+  <!-- Curved baseline (equal radial gap to circle on left & right) -->
+  <path d="M80 250
+           Q256 215 432 250"
+        fill="none"
+        stroke="#2F80ED"
+        stroke-width="14"
+        stroke-linecap="round"/>
+
+  <!-- Zig-zag growth line (bottom-left endpoint matches top-right endpoint's gap) -->
+  <path d="M103.1242334443 325
+           L200 255
+           L245 270
+           L305 210
+           L345 235
+           L400 170"
+        fill="none"
+        stroke="#2F80ED"
+        stroke-width="22"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Data Nodes -->
+  <circle cx="200" cy="255" r="14" fill="#2F80ED"/>
+  <circle cx="245" cy="270" r="14" fill="#2F80ED"/>
+  <circle cx="305" cy="210" r="14" fill="#2F80ED"/>
+  <circle cx="345" cy="235" r="14" fill="#2F80ED"/>
+  <circle cx="400" cy="170" r="14" fill="#2F80ED"/>
+
+</svg>
