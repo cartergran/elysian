@@ -83,9 +83,13 @@ app.post('/api/extract', authMiddleware, upload.single('file'), async (req, res)
     });
 
   } catch (err) {
-    const errDetail = `Error processing file: ${err.message}`;
-    console.error(errDetail);
-    return res.status(500).json({ detail: errDetail });
+    console.error(`Error processing file: ${err.message}`);
+
+    if (err.status === 429) {
+      return res.status(429).json({ detail: MESSAGES.RATE_LIMIT_EXCEEDED });
+    }
+
+    return res.status(500).json({ detail: `Error processing file: ${err.message}` });
   }
 });
 

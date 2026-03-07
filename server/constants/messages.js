@@ -15,4 +15,7 @@ export const MESSAGES = {
   FILE_SIZE_EXCEEDED: 'File size exceeds 32MB limit.',
   REPORT_PROCESSED_SUCCESS: 'Report processed successfully',
   ONLY_PDF_ALLOWED: 'Only PDF files are allowed.',
+
+  // model
+  RATE_LIMIT_EXCEEDED: 'Rate limit exceeded. Please wait a moment and try again.',
 };

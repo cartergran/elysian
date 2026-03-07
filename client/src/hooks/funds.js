@@ -11,10 +11,13 @@ const fetchFunds = async () => {
   return data;
 };
 
-// POST /api/funds
+// POST /api/extract — S3 + LLM parsing + DB upsert
+const UPLOAD_TIMEOUT_MS = 83000; // 1 minute 23 seconds
+
 const uploadFund = async (formData) => {
   const { data } = await api.post('/extract', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: UPLOAD_TIMEOUT_MS
   });
   return data;
 };

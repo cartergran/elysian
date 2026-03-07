@@ -16,7 +16,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import styled from 'styled-components';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useUploadFund } from '../hooks/funds';
 
@@ -80,6 +80,13 @@ const Upload = ({ fundName: initialFundName }) => {
   const [fundName, setFundName] = useState(initialFundName ?? '');
   const [fundNameError, setFundNameError] = useState(null);
   const [fundNameTouched, setFundNameTouched] = useState(false);
+
+  // sync fund name when dialog opens
+  useEffect(() => {
+    if (open) {
+      setFundName(initialFundName ?? '');
+    }
+  }, [open]);
 
   // server state
   const [globalError, setGlobalError] = useState(null);
