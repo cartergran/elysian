@@ -200,12 +200,17 @@ const Dashboard = () => {
 
   const handleToggleRow = useCallback((entityName) => {
     setSelectedEntities(prev => {
+      // if all entities are selected, only select the clicked entity
+      if (prev.size === initialEntities.length) {
+        return new Set([entityName]);
+      }
+      // otherwise, toggle the entity
       const next = new Set(prev);
       next.has(entityName) ? next.delete(entityName) : next.add(entityName);
       return next;
     });
     setNewEntities(false);
-  }, []);
+  }, [initialEntities]);
 
   const handleToggleRows = useCallback((entityNames) => {
     setSelectedEntities((prev) => {

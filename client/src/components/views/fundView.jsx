@@ -117,6 +117,7 @@ const FundView = ({
             return (
               <FadedTableRow
                 key={companyName}
+                hover
                 $isVisible={isVisible}
                 {...chartCompanies && {
                   onMouseEnter: () => onHoverRow(companyName),

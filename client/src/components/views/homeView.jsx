@@ -96,7 +96,7 @@ const HomeView = ({
             ];
 
             return (
-              <TableRow key={fundName}>
+              <TableRow key={fundName} hover>
                 {
                   cells.map((cell, idx) => (
                     <TableCell key={idx}>
