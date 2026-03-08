@@ -6,7 +6,7 @@ import { SESSION_KEY } from '../context/auth';
 
 const api = axios.create({
   baseURL: '/api',
-  timeout: 10000
+  timeout: 15000 // 15s covers polling responses and normal API calls
 });
 
 api.interceptors.request.use((config) => {

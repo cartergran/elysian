@@ -8,6 +8,14 @@ import authMiddleware from './middleware/auth.js';
 import authRouter from './routes/auth.js';
 import callAndParseAnthropic from './services/model.js';
 import getFunds, { CONNECTION_ERROR_CODES } from './services/query.js';
+import {
+  JOB_STATUS,
+  completeJob,
+  createJob,
+  ensureJobLogTable,
+  failJob,
+  getJob,
+} from './services/jobs.js';
 import { MESSAGES } from './constants/messages.js';
 import putPdfAndGetUrlFromS3 from './services/bucket.js';
 import { securityMiddleware } from './middleware/security.js';
@@ -41,10 +49,33 @@ const upload = multer({
   }
 });
 
+/**
+ * - heavy lifting runs in the background so the initial POST
+ * always responds well within Heroku's 30-second request timeout
+ */
+async function processExtraction(jobId, signedUrl, fundName) {
+  try {
+    const { period, investments } = await callAndParseAnthropic(signedUrl);
+    await upsertFund({ fundName, period, investments });
+    await completeJob(jobId);
+    console.log(`Job ${jobId} completed`);
+  } catch (err) {
+    console.error(`Job ${jobId} failed: ${err.message}`);
+    await failJob(jobId, err.message);
+  }
+}
+
+/**
+ * POST /api/extract
+ * 1. validates inputs and uploads the PDF to S3 (fast — typically < 10s)
+ * 2. creates a job record and responds 202 immediately
+ * 3. runs Claude extraction + DB upsert in the background
+ */
 app.post('/api/extract', authMiddleware, upload.single('file'), async (req, res) => {
   try {
     const file = req.file;
     const fundName = req.body.fundName;
+
     if (!file) {
       return res.status(400).json({ detail: MESSAGES.NO_FILE_UPLOADED });
     }
@@ -52,44 +83,57 @@ app.post('/api/extract', authMiddleware, upload.single('file'), async (req, res)
       return res.status(400).json({ detail: MESSAGES.NO_FUND_NAME_ENTERED });
     }
 
-    const filename = req.file.originalname;
+    const filename = file.originalname;
     console.log('filename:', filename);
 
-    const signedUrl = await putPdfAndGetUrlFromS3(req.file.buffer, filename);
-    const { period, investments } = await callAndParseAnthropic(signedUrl);
-    const payload = {
-      fundName,
-      period,
-      investments,
-    };
-    // console.log('payload:', payload);
-    await upsertFund(payload);
+    // S3 upload is fast enough to do synchronously before responding
+    const signedUrl = await putPdfAndGetUrlFromS3(file.buffer, filename);
 
-    /*
-    const fileBuffer = req.file.buffer;
-    let base64Pdf;
-    try {
-      base64Pdf = fileBuffer.toString('base64');
-    } catch (err) {
-      const errDetail = `Error encoding PDF: ${err.message}`;
-      console.error(errDetail);
-      return res.status(500).json({ detail: errDetail });
-    }
-    */
+    const jobId = await createJob(fundName);
 
-    res.json({
-      message: MESSAGES.REPORT_PROCESSED_SUCCESS,
-      size: file.size
+    // Respond immediately — Claude + DB work runs after the response is sent
+    res.status(202).json({ jobId });
+
+    processExtraction(jobId, signedUrl, fundName).catch((err) => {
+      console.error(`Unhandled background error for job ${jobId}: ${err.message}`);
     });
 
   } catch (err) {
-    console.error(`Error processing file: ${err.message}`);
+    console.error(`Error initiating extraction: ${err.message}`);
 
     if (err.status === 429) {
       return res.status(429).json({ detail: MESSAGES.RATE_LIMIT_EXCEEDED });
     }
 
-    return res.status(500).json({ detail: `Error processing file: ${err.message}` });
+    return res.status(500).json({ detail: `Error initiating extraction: ${err.message}` });
+  }
+});
+
+/**
+ * GET /api/jobs/:id
+ * - returns the current status of an extraction job
+ * - clients poll this until status is 'done' or 'error'
+ */
+app.get('/api/jobs/:id', authMiddleware, async (req, res) => {
+  try {
+    const job = await getJob(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ detail: MESSAGES.JOB_NOT_FOUND });
+    }
+
+    if (job.status === JOB_STATUS.DONE) {
+      return res.json({ status: job.status, message: MESSAGES.REPORT_PROCESSED_SUCCESS });
+    }
+
+    if (job.status === JOB_STATUS.ERROR) {
+      return res.json({ status: job.status, detail: job.error_msg || MESSAGES.JOB_PROCESSING_FAILED });
+    }
+
+    return res.json({ status: job.status });
+  } catch (err) {
+    console.error(`Error fetching job: ${err.message}`);
+    return res.status(500).json({ detail: `Error fetching job: ${err.message}` });
   }
 });
 
@@ -143,6 +187,12 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server listening on ${PORT}`);
+  try {
+    await ensureJobLogTable();
+    console.log('job_log table ready');
+  } catch (err) {
+    console.error('Failed to ensure job_log table:', err.message);
+  }
 });

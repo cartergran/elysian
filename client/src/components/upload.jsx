@@ -256,7 +256,14 @@ const Upload = ({ fundName: initialFundName }) => {
               { file && <Typography variant="body2">{file.name}</Typography> }
 
               {/* TODO: transition  */}
-              { isPending && <StyledLinearProgress /> }
+              { isPending && (
+                <Stack alignItems="center" gap={1} width="100%">
+                  <StyledLinearProgress />
+                  <Typography color="text.secondary" variant="caption">
+                    Analyzing report with AI...
+                  </Typography>
+                </Stack>
+              ) }
 
               {/* TODO: transition  */}
               { response && <Typography variant={"body2"}>{response.message}</Typography> }
