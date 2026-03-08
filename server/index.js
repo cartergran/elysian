@@ -6,7 +6,7 @@ import path from 'path';
 
 import authMiddleware from './middleware/auth.js';
 import authRouter from './routes/auth.js';
-import callAndParseAnthropic from './services/model.js';
+import callAndParseAnthropic, { isRateLimitError } from './services/model.js';
 import getFunds, { CONNECTION_ERROR_CODES } from './services/query.js';
 import {
   JOB_STATUS,
@@ -61,7 +61,8 @@ async function processExtraction(jobId, signedUrl, fundName) {
     console.log(`Job ${jobId} completed`);
   } catch (err) {
     console.error(`Job ${jobId} failed: ${err.message}`);
-    await failJob(jobId, err.message);
+    const message = isRateLimitError(err) ? MESSAGES.RATE_LIMIT_EXCEEDED : err.message;
+    await failJob(jobId, message);
   }
 }
 
@@ -100,11 +101,6 @@ app.post('/api/extract', authMiddleware, upload.single('file'), async (req, res)
 
   } catch (err) {
     console.error(`Error initiating extraction: ${err.message}`);
-
-    if (err.status === 429) {
-      return res.status(429).json({ detail: MESSAGES.RATE_LIMIT_EXCEEDED });
-    }
-
     return res.status(500).json({ detail: `Error initiating extraction: ${err.message}` });
   }
 });
@@ -127,7 +123,10 @@ app.get('/api/jobs/:id', authMiddleware, async (req, res) => {
     }
 
     if (job.status === JOB_STATUS.ERROR) {
-      return res.json({ status: job.status, detail: job.error_msg || MESSAGES.JOB_PROCESSING_FAILED });
+      return res.json({
+        status: job.status,
+        detail: job.error_msg || MESSAGES.JOB_PROCESSING_FAILED
+      });
     }
 
     return res.json({ status: job.status });

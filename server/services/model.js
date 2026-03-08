@@ -91,4 +91,6 @@ const callAndParseAnthropic = async (signedUrl) => {
   return parseAnthropicResponse(res);
 };
 
+export const isRateLimitError = (err) => (err?.status ?? err?.statusCode) === 429;
+
 export default callAndParseAnthropic;
