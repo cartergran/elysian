@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Table,
   TableCell,
   TableContainer,
@@ -8,32 +12,11 @@ import {
 import FundView from './views/fundView';
 import HomeView from './views/homeView';
 
-const COLUMN_HEADERS_BY_DATA_POINT = {
-  HOME: {
-    totalValue: 'Total Value',
-    investedCapital: 'Invested Capital',
-    realizedValue: 'Realized Value',
-    unrealizedValue: 'Unrealized Value',
-    returnPercent: 'Return'
-  },
-  FUND: {
-    totalValue: 'Total Value',
-    investedCapital: 'Invested Capital',
-    returnPercent: 'Return'
-  }
-};
-
-const FILTER_COLUMN_HEADERS = [
-  'Total Value',
-  'Invested Capital',
-  'Realized Value',
-  'Unrealized Value'
-];
-
-const SELECTABLE_COLUMN_HEADERS = {
-  HOME: 'Fund',
-  FUND: 'Company'
-};
+import {
+  COLUMN_HEADERS_BY_DATA_POINT,
+  FILTER_COLUMN_HEADERS,
+  SELECTABLE_COLUMN_HEADERS
+} from '../utils/portfolio';
 
 const viewRegistry = {
   HOME: HomeView,
@@ -56,27 +39,62 @@ const FilterHeaderCell = styled(TableCell)`
   user-select: none;
 `;
 
+const StyledPortfolio = styled.div`
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+const SortableFormControl = styled(FormControl)`
+  min-width: 180px;
+
+  align-self: flex-end;
+`;
+
 const ScrollableTableContainer = styled(TableContainer)`
   max-height: 440px;
+
   overflow-y: auto;
 `;
 
 const Portfolio = ({ model, view, controller }) => {
   const ActiveView = viewRegistry[view.mode] || (() => null);
+  const columnHeadersByDataPoint = COLUMN_HEADERS_BY_DATA_POINT[view.mode] || {};
 
   return (
-    <ScrollableTableContainer>
-      <Table stickyHeader>
-        <ActiveView
-          columnHeadersByDataPoint={COLUMN_HEADERS_BY_DATA_POINT[view.mode]}
-          filterColumnHeaders={FILTER_COLUMN_HEADERS}
-          selectableColumnHeader={SELECTABLE_COLUMN_HEADERS[view.mode]}
-          FilterHeaderCell={FilterHeaderCell}
-          {...model}
-          {...controller}
-        />
-      </Table>
-    </ScrollableTableContainer>
+    <StyledPortfolio>
+      <SortableFormControl size="small">
+        <InputLabel htmlFor="sort-select">
+          Sort by
+        </InputLabel>
+        <Select
+          inputProps={{ id: 'sort-select' }}
+          label="Sort by"
+          value={model.sortColumn}
+          onChange={(e) => controller.onSortChange(e.target.value)}
+        >
+          {
+            Object.entries(columnHeadersByDataPoint).map(([key, label]) => (
+              <MenuItem key={key} value={key}>{label}</MenuItem>
+            ))
+          }
+        </Select>
+      </SortableFormControl>
+      <ScrollableTableContainer>
+        <Table stickyHeader>
+          <ActiveView
+            columnHeadersByDataPoint={columnHeadersByDataPoint}
+            filterColumnHeaders={FILTER_COLUMN_HEADERS[view.mode]}
+            selectableColumnHeader={SELECTABLE_COLUMN_HEADERS[view.mode]}
+            FilterHeaderCell={FilterHeaderCell}
+            {...model}
+            {...controller}
+          />
+        </Table>
+      </ScrollableTableContainer>
+    </StyledPortfolio>
   );
 };
 

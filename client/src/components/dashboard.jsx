@@ -7,8 +7,9 @@ import Filter from './filter';
 import Header from './header';
 import Portfolio from './portfolio';
 
+import { calcReturnPercent, toChartData } from '../utils/investments';
+import { DEFAULT_SELECTED_COLUMN, DEFAULT_SORT_COLUMN } from '../utils/portfolio';
 import { slugify, deslugify } from '../utils/helpers';
-import { toChartData } from '../utils/investments';
 import { useFunds } from '../hooks/funds';
 
 // TODO: tmp
@@ -27,12 +28,6 @@ const StyledDashboard = styled.div`
 
   padding: ${({ theme }) => theme.spacing(4)};
 `;
-
-const DEFAULT_SELECTED_COLUMN = {
-  idx: 0,
-  title: 'Total Value',
-  dataPoint: 'totalValue'
-};
 
 const FILTERS = [
   { label: '1Q', period: 1 },
@@ -53,6 +48,7 @@ const Dashboard = () => {
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
   const [selectedColumn, setSelectedColumn] = useState(DEFAULT_SELECTED_COLUMN);
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
+  const [sortColumn, setSortColumn] = useState(DEFAULT_SORT_COLUMN);
 
   const FUNDS_BY_NAME = useMemo(() => (
     funds.reduce((acc, f) => { acc[f.fundName] = f; return acc; }, {})
@@ -141,17 +137,30 @@ const Dashboard = () => {
   */
   const portfolioData = useMemo(() => {
     let retVal = [];
+
+    const descendingBy = (getVal) => (a, b) => (getVal(b) ?? 0) - (getVal(a) ?? 0);
+    const sortValue = (round) => {
+      if (sortColumn === 'returnPercent') {
+        // TODO: not calc'd or stored in API
+        return calcReturnPercent(round.totalValue, round.investedCapital);
+      }
+      return round[sortColumn];
+    };
+
     if (view.mode === 'FUND') {
-      retVal = fund.investments;
+      retVal = [...fund.investments].sort(
+        // at(-1) := last investment round
+        descendingBy((i) => sortValue(i.investmentRounds.at(-1)))
+      );
     } else {
-      retVal = funds.map(({ fundName, investmentRoundsSummary }) => ({
-        fundName,
-        investmentRoundsSummary
-      }));
+      retVal = funds
+        .map(({ fundName, investmentRoundsSummary }) => ({ fundName, investmentRoundsSummary }))
+        // at(-1) := last investment round summary
+        .sort(descendingBy((f) => sortValue(f.investmentRoundsSummary.at(-1))));
     }
 
     return retVal;
-  }, [fund, funds, view]);
+  }, [fund, funds, sortColumn, view]);
 
   // entity list for selection
   const initialEntities = useMemo(() => {
@@ -186,6 +195,10 @@ const Dashboard = () => {
     setSelectedEntities(new Set(initialEntities));
     setNewEntities(true);
   }, [initialEntities]);
+
+  useEffect(() => {
+    setSortColumn(DEFAULT_SORT_COLUMN);
+  }, [view.mode]);
 
   const handleCrumbClick = useCallback((idx) => {
     setChartCompanies(false);
@@ -226,6 +239,7 @@ const Dashboard = () => {
     portfolioData,
     selectedColumn,
     selectedEntities,
+    sortColumn,
     visibleEntities
   }), [
     chartCompanies,
@@ -233,6 +247,7 @@ const Dashboard = () => {
     portfolioData,
     selectedColumn,
     selectedEntities,
+    sortColumn,
     visibleEntities
   ]);
 
@@ -240,6 +255,7 @@ const Dashboard = () => {
     onColumnHeaderClick: setSelectedColumn,
     onFundNameClick: handleFundNameClick,
     onHoverRow: setHoveredEntity,
+    onSortChange: setSortColumn,
     onToggleRow: handleToggleRow,
     onToggleRows: handleToggleRows
   }), [

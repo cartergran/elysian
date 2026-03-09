@@ -1,6 +1,7 @@
 const calcReturnPercent = (totalValue, investedCapital) => {
-  let valueChange = totalValue - investedCapital;
-  return ((valueChange / investedCapital) * 100).toFixed(1);
+  const valueChange = totalValue - investedCapital;
+  const pct = (valueChange / investedCapital) * 100;
+  return Math.round(pct * 10) / 10;
 };
 
 const formatCurrency = (value) => {
