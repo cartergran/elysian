@@ -11,12 +11,34 @@ const fetchFunds = async () => {
   return data;
 };
 
-// POST /api/funds
+// POST /api/extract — uploads PDF and returns a job ID immediately (202)
+// GET /api/jobs/:id — polled until the job is done or errored
+const POLL_INTERVAL_MS = 3000;
+const POLL_TIMEOUT_MS  = 5 * 60 * 1000; // 5 minutes
+
+const pollJobUntilDone = async (jobId) => {
+  const deadline = Date.now() + POLL_TIMEOUT_MS;
+
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+
+    const { data } = await api.get(`/jobs/${jobId}`);
+
+    if (data.status === 'done')  return data;
+    if (data.status === 'error') throw new Error(data.detail || 'Processing failed.');
+    // status === 'pending' — keep polling
+  }
+
+  throw new Error('Processing timed out. Please try again.');
+};
+
 const uploadFund = async (formData) => {
+  // the POST only needs to complete S3 upload before responding (well under 30s)
   const { data } = await api.post('/extract', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
-  return data;
+
+  return pollJobUntilDone(data.jobId);
 };
 
 const useFunds = () => {

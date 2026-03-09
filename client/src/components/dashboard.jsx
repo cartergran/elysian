@@ -28,8 +28,8 @@ const StyledDashboard = styled.div`
   padding: ${({ theme }) => theme.spacing(4)};
 `;
 
-const DEFAULT_COLUMN = {
-  idx: 1,
+const DEFAULT_SELECTED_COLUMN = {
+  idx: 0,
   title: 'Total Value',
   dataPoint: 'totalValue'
 };
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
-  const [selectedColumn, setSelectedColumn] = useState(DEFAULT_COLUMN);
+  const [selectedColumn, setSelectedColumn] = useState(DEFAULT_SELECTED_COLUMN);
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
 
   const FUNDS_BY_NAME = useMemo(() => (
@@ -153,10 +153,23 @@ const Dashboard = () => {
     return retVal;
   }, [fund, funds, view]);
 
-  const initialEntities = useMemo(() => chartData.entityNames, [chartData]);
+  // entity list for selection
+  const initialEntities = useMemo(() => {
+    let retVal = [];
+    if (view.mode === 'FUND') {
+      if (fund) {
+        retVal = chartCompanies ? fund.investments.map((i) => i.companyName) : [fund.fundName];
+      }
+    } else {
+      retVal = funds.map((f) => f.fundName);
+    }
+
+    return retVal;
+  }, [chartCompanies, fund, funds, view]);
+
   const [hoveredEntity, setHoveredEntity] = useState(null);
   const [newEntities, setNewEntities] = useState(true);
-  const [selectedEntities, setSelectedEntities] = useState(new Set(initialEntities));
+  const [selectedEntities, setSelectedEntities] = useState(() => new Set(initialEntities));
   const selectedSwitchDisabled =
     selectedEntities.size === initialEntities.length  || selectedEntities.size === 0;
 
@@ -176,23 +189,28 @@ const Dashboard = () => {
 
   const handleCrumbClick = useCallback((idx) => {
     setChartCompanies(false);
-    setSelectedColumn(DEFAULT_COLUMN);
+    setSelectedColumn(DEFAULT_SELECTED_COLUMN);
     navByIdx[idx]();
   }, [navByIdx]);
 
   const handleFundNameClick = useCallback((fundName) => {
-    setSelectedColumn(DEFAULT_COLUMN);
+    setSelectedColumn(DEFAULT_SELECTED_COLUMN);
     goFund(fundName);
   }, [goFund]);
 
   const handleToggleRow = useCallback((entityName) => {
     setSelectedEntities(prev => {
+      // if all entities are selected, only select the clicked entity
+      if (prev.size === initialEntities.length) {
+        return new Set([entityName]);
+      }
+      // otherwise, toggle the entity
       const next = new Set(prev);
       next.has(entityName) ? next.delete(entityName) : next.add(entityName);
       return next;
     });
     setNewEntities(false);
-  }, []);
+  }, [initialEntities]);
 
   const handleToggleRows = useCallback((entityNames) => {
     setSelectedEntities((prev) => {

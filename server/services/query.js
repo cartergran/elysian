@@ -1,6 +1,27 @@
 import { n } from '../utils.js';
 import pool from '../infra/db.js';
 
+export const CONNECTION_ERROR_CODES = new Set(['ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'PROTOCOL_CONNECTION_LOST']);
+const MAX_QUERY_RETRIES = 3;
+
+async function queryWithRetry(sql) {
+  let lastErr;
+  for (let attempt = 1; attempt <= MAX_QUERY_RETRIES; attempt++) {
+    try {
+      return await pool.query(sql);
+    } catch (err) {
+      lastErr = err;
+      const code = err.code || err.errno;
+      if (CONNECTION_ERROR_CODES.has(code) && attempt < MAX_QUERY_RETRIES) {
+        await new Promise((r) => setTimeout(r, 1000 * attempt));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr;
+}
+
 const addFundInvestmentSummaries = (funds, iSummaryRows) => {
   for (const r of iSummaryRows) {
     const fundId = r.fund_id;
@@ -83,7 +104,7 @@ const getFunds = async () => {
     JOIN investment_round ir ON ir.investment_id = i.investment_id
     ORDER BY f.fund_id, c.company_name, ir.period_year, ir.period_quarter
   `;
-  const [iRows] = await pool.query(iSql);
+  const [iRows] = await queryWithRetry(iSql);
 
   const iSummarySql = `
     SELECT
@@ -100,7 +121,7 @@ const getFunds = async () => {
     JOIN fund_round_summary s ON s.fund_id = f.fund_id
     ORDER BY f.fund_id, s.period_year, s.period_quarter
   `;
-  const [iSummaryRows] = await pool.query(iSummarySql);
+  const [iSummaryRows] = await queryWithRetry(iSummarySql);
 
   // console.log('iRows', iRows);
   // console.log('iSummaryRows', iSummaryRows);

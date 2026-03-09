@@ -8,22 +8,6 @@ import {
 import FundView from './views/fundView';
 import HomeView from './views/homeView';
 
-const FilterHeaderCell = styled(TableCell)`
-  color:
-    ${({ theme, $selected  }) => $selected
-      ? theme.palette.primary.light
-      : theme.palette.secondary.main
-    };
-  font-size:
-    ${({ theme, $selected  }) => $selected
-      ? theme.typography.subtitle1.fontSize
-      : theme.typography.subtitle2.fontSize
-    };
-  cursor: ${({ $selectable }) => $selectable ? 'pointer' : 'default'};
-  transition: all 0.25s ease-in-out;
-  user-select: none;
-`;
-
 const COLUMN_HEADERS_BY_DATA_POINT = {
   HOME: {
     totalValue: 'Total Value',
@@ -56,12 +40,33 @@ const viewRegistry = {
   FUND: FundView
 };
 
+const FilterHeaderCell = styled(TableCell)`
+  color:
+    ${({ theme, $selected  }) => $selected
+      ? theme.palette.primary.light
+      : theme.palette.text.primary
+    };
+  font-size:
+    ${({ theme, $selected  }) => $selected
+      ? theme.typography.subtitle1.fontSize
+      : theme.typography.subtitle2.fontSize
+    };
+  cursor: ${({ $selectable }) => $selectable ? 'pointer' : 'default'};
+  transition: all 0.25s ease-in-out;
+  user-select: none;
+`;
+
+const ScrollableTableContainer = styled(TableContainer)`
+  max-height: 440px;
+  overflow-y: auto;
+`;
+
 const Portfolio = ({ model, view, controller }) => {
   const ActiveView = viewRegistry[view.mode] || (() => null);
 
   return (
-    <TableContainer>
-      <Table>
+    <ScrollableTableContainer>
+      <Table stickyHeader>
         <ActiveView
           columnHeadersByDataPoint={COLUMN_HEADERS_BY_DATA_POINT[view.mode]}
           filterColumnHeaders={FILTER_COLUMN_HEADERS}
@@ -71,7 +76,7 @@ const Portfolio = ({ model, view, controller }) => {
           {...controller}
         />
       </Table>
-    </TableContainer>
+    </ScrollableTableContainer>
   );
 };
 

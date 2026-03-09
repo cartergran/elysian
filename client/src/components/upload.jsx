@@ -15,8 +15,8 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { useRef, useState } from 'react';
 import styled from 'styled-components';
+import { useEffect, useRef, useState } from 'react';
 
 import { useUploadFund } from '../hooks/funds';
 
@@ -80,6 +80,13 @@ const Upload = ({ fundName: initialFundName }) => {
   const [fundName, setFundName] = useState(initialFundName ?? '');
   const [fundNameError, setFundNameError] = useState(null);
   const [fundNameTouched, setFundNameTouched] = useState(false);
+
+  // sync fund name when dialog opens
+  useEffect(() => {
+    if (open) {
+      setFundName(initialFundName ?? '');
+    }
+  }, [open]);
 
   // server state
   const [globalError, setGlobalError] = useState(null);
@@ -195,7 +202,7 @@ const Upload = ({ fundName: initialFundName }) => {
 
   return (
     <>
-      <IconButton color="secondary" onClick={() => setOpen(true)}>
+      <IconButton sx={{ color: 'primary.light' }} onClick={() => setOpen(true)}>
         <StyledUploadIcon />
       </IconButton>
 
@@ -249,7 +256,14 @@ const Upload = ({ fundName: initialFundName }) => {
               { file && <Typography variant="body2">{file.name}</Typography> }
 
               {/* TODO: transition  */}
-              { isPending && <StyledLinearProgress /> }
+              { isPending && (
+                <Stack alignItems="center" gap={1} width="100%">
+                  <StyledLinearProgress />
+                  <Typography color="text.secondary" variant="caption">
+                    Analyzing report with AI...
+                  </Typography>
+                </Stack>
+              ) }
 
               {/* TODO: transition  */}
               { response && <Typography variant={"body2"}>{response.message}</Typography> }

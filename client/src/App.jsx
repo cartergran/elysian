@@ -6,8 +6,10 @@ import { ThemeProvider } from '@mui/material/styles';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import { AuthProvider, useAuth } from './context/auth';
 import Dashboard from './components/dashboard';
 import Layout from './components/layout';
+import Login from './components/login';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,6 +20,31 @@ const queryClient = new QueryClient({
   }
 });
 
+const AppRoutes = () => {
+  const { token } = useAuth();
+
+  if (!token) {
+    return <Login />;
+  }
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          {/* HOME */}
+          <Route path="/" element={<Dashboard />} />
+          {/* FUND */}
+          <Route path="/fund/:fundSlug" element={<Dashboard />} />
+          {/* COMPANY */}
+          <Route path="/fund/:fundSlug/company/:companySlug" element={<Dashboard />} />
+          {/* TODO: 404 */}
+          <Route path="*" element={<h1>ERROR</h1>} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -25,24 +52,13 @@ const App = () => {
         <StyledThemeProvider theme={theme}>
           <CssBaseline />
           <GlobalStyle />
-          <BrowserRouter>
-            <Routes>
-              <Route element={<Layout />}>
-                {/* HOME */}
-                <Route path="/" element={<Dashboard />} />
-                {/* FUND */}
-                <Route path="/fund/:fundSlug" element={<Dashboard />} />
-                {/* COMPANY */}
-                <Route path="/fund/:fundSlug/company/:companySlug" element={<Dashboard />} />
-                {/* TODO: 404 */}
-                <Route path="*" element={<h1>ERROR</h1>} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </StyledThemeProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
-}
+};
 
-export default App
+export default App;

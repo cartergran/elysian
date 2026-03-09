@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
-import { formatCurrency, getReturnPercent } from '../../utils/investments';
+import { formatCurrency, calcReturnPercent } from '../../utils/investments';
 
 const ColoredCompanyName = styled(Typography)`
   color: ${({ $color }) => $color};
@@ -48,13 +48,13 @@ const FundView = ({
   onToggleRows,
 }) => {
   const theme = useTheme();
+  const entityColors = theme.palette.entities;
 
   const rows = useMemo(() => portfolioData.map(({ companyName, investmentRounds }) => {
-    let currentInvestment = investmentRounds.at(-1);
-    let returnPercent = getReturnPercent(
-      currentInvestment,
-      investmentRounds,
-      filterPeriod
+    const currentInvestment = investmentRounds.at(-1);
+    const returnPercent = calcReturnPercent(
+      currentInvestment.totalValue,
+      currentInvestment.investedCapital
     );
 
     return {
@@ -65,7 +65,6 @@ const FundView = ({
     };
   }), [portfolioData, filterPeriod]);
 
-  const entityColors = theme.palette.entities || [];
   const companyEntities = useMemo(() => rows.map((r) => r.companyName), [rows]);
   const handleSelectableHeaderClick = (e) => {
     e.stopPropagation();
@@ -118,6 +117,7 @@ const FundView = ({
             return (
               <FadedTableRow
                 key={companyName}
+                hover
                 $isVisible={isVisible}
                 {...chartCompanies && {
                   onMouseEnter: () => onHoverRow(companyName),

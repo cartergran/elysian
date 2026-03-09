@@ -6,7 +6,10 @@ const ANTHROPIC_API_KEY = requireEnvVariable('ANTHROPIC_API_KEY');
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
 const EXTRACTION_PROMPT = process.env.EXTRACTION_PROMPT || 'Return an empty array [] as plain text.';
 
-const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+const anthropic = new Anthropic({
+  apiKey: ANTHROPIC_API_KEY,
+  maxRetries: 4, // exponential backoff: ~1s, 2s, 4s, 8s between attempts
+});
 
 const OUTPUT_SCHEMA = {
   additionalProperties: false,
@@ -87,5 +90,7 @@ const callAndParseAnthropic = async (signedUrl) => {
 
   return parseAnthropicResponse(res);
 };
+
+export const isRateLimitError = (err) => (err?.status ?? err?.statusCode) === 429;
 
 export default callAndParseAnthropic;

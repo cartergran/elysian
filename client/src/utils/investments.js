@@ -1,3 +1,18 @@
+const calcReturnPercent = (totalValue, investedCapital) => {
+  let valueChange = totalValue - investedCapital;
+  return ((valueChange / investedCapital) * 100).toFixed(1);
+};
+
+const formatCurrency = (value) => {
+  if (value == null || isNaN(value)) return 'N/A';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  }).format(value);
+};
+
 const toChartData = (data, dataPoint = 'totalValue') => {
   let periodMap = new Map();
 
@@ -12,40 +27,20 @@ const toChartData = (data, dataPoint = 'totalValue') => {
     });
   });
 
+  const byPeriod = (a, b) => {
+    const [ya, qa] = a.period.split('-Q').map(Number);
+    const [yb, qb] = b.period.split('-Q').map(Number);
+    return ya - yb || qa - qb;
+  };
+
   return {
     entityNames: Object.keys(data),
-    dataPointsPerPeriod: Array.from(periodMap.values())
+    dataPointsPerPeriod: Array.from(periodMap.values()).sort(byPeriod)
   };
 };
 
-const calcReturnPercent = (initialValue, currentValue) => {
-  let valueChange = currentValue - initialValue;
-  return ((valueChange / initialValue) * 100).toFixed(1);
-};
-
-const getReturnPercent = (currentInvestment, investments, filterPeriod) => {
-  let initialIdx = filterPeriod + 1;
-  let isValidIdx = initialIdx < investments.length;
-  let initialInvestment = investments.at(isValidIdx ? -initialIdx : 0);
-
-  return calcReturnPercent(
-    initialInvestment.totalValue,
-    currentInvestment.totalValue
-  );
-};
-
-const formatCurrency = (value) => {
-  if (value == null || isNaN(value)) return 'N/A';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1,
-  }).format(value);
-};
-
 export {
-  toChartData,
-  getReturnPercent,
-  formatCurrency
+  calcReturnPercent,
+  formatCurrency,
+  toChartData
 };
