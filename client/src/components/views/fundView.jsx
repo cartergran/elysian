@@ -61,6 +61,8 @@ const FundView = ({
       companyName,
       investedCapital: currentInvestment.investedCapital,
       totalValue: currentInvestment.totalValue,
+      realizedValue: currentInvestment.realizedValue,
+      unrealizedValue: currentInvestment.unrealizedValue,
       returnPercent
     };
   }), [portfolioData, filterPeriod]);
@@ -102,10 +104,19 @@ const FundView = ({
       </TableHead>
       <TableBody>
         {
-          rows.map(({ companyName, totalValue, investedCapital, returnPercent }, idx) => {
+          rows.map(({
+            companyName,
+            totalValue,
+            investedCapital,
+            realizedValue,
+            unrealizedValue,
+            returnPercent
+          }, idx) => {
             const cells = [
               formatCurrency(totalValue),
               formatCurrency(investedCapital),
+              formatCurrency(realizedValue),
+              formatCurrency(unrealizedValue),
               `${returnPercent}%`
             ];
             const isVisible = !chartCompanies || visibleEntities.has(companyName);

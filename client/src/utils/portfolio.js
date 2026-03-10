@@ -10,14 +10,12 @@ const pick = (obj, keys) => Object.fromEntries(keys.map(k => [k, obj[k]]));
 
 const COLUMN_HEADERS_BY_DATA_POINT = {
   HOME: COLUMN_LABELS,
-  FUND: pick(COLUMN_LABELS, [
-    'totalValue', 'investedCapital', 'returnPercent'
-  ])
+  FUND: COLUMN_LABELS
 };
 
 const FILTER_COLUMN_KEYS = {
   HOME: ['totalValue', 'investedCapital', 'realizedValue', 'unrealizedValue'],
-  FUND: ['totalValue', 'investedCapital']
+  FUND: ['totalValue', 'investedCapital', 'realizedValue', 'unrealizedValue']
 };
 
 const FILTER_COLUMN_HEADERS = {

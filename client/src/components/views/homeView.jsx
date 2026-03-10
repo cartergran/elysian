@@ -79,15 +79,6 @@ const HomeView = ({
             returnPercent
           }, idx) => {
             const cells = [
-              <ColoredFundName
-                key={fundName}
-                component="button"
-                underline="hover"
-                $color={entityColors[idx % entityColors.length]}
-                onClick={() => onFundNameClick(fundName)}
-              >
-                {fundName}
-              </ColoredFundName>,
               formatCurrency(totalValue),
               formatCurrency(investedCapital),
               formatCurrency(realizedValue),
@@ -97,6 +88,17 @@ const HomeView = ({
 
             return (
               <TableRow key={fundName} hover>
+                <TableCell>
+                  <ColoredFundName
+                    key={fundName}
+                    component="button"
+                    underline="hover"
+                    $color={entityColors[idx % entityColors.length]}
+                    onClick={() => onFundNameClick(fundName)}
+                  >
+                    {fundName}
+                  </ColoredFundName>
+                </TableCell>
                 {
                   cells.map((cell, idx) => (
                     <TableCell key={idx}>
