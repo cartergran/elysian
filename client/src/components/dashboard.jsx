@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -67,6 +67,13 @@ const Dashboard = () => {
     };
     return { entityName: 'fund', mode: 'HOME', params: {} };
   }, [fundName, companyName]);
+
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [prevViewMode, setPrevViewMode] = useState(view.mode);
+  if (view.mode !== prevViewMode) {
+    setPrevViewMode(view.mode);
+    setSortColumn(DEFAULT_SORT_COLUMN);
+  }
 
   const goHome = () => nav('/');
   const goFund = (f) => nav(`/fund/${slugify(f)}`);
@@ -179,6 +186,13 @@ const Dashboard = () => {
   const [hoveredEntity, setHoveredEntity] = useState(null);
   const [newEntities, setNewEntities] = useState(true);
   const [selectedEntities, setSelectedEntities] = useState(() => new Set(initialEntities));
+  const [prevInitialEntities, setPrevInitialEntities] = useState(initialEntities);
+  if (initialEntities !== prevInitialEntities) {
+    setPrevInitialEntities(initialEntities);
+    setSelectedEntities(new Set(initialEntities));
+    setNewEntities(true);
+  }
+
   const selectedSwitchDisabled =
     selectedEntities.size === initialEntities.length  || selectedEntities.size === 0;
 
@@ -190,15 +204,6 @@ const Dashboard = () => {
     next.add(hoveredEntity);
     return next;
   }, [hoveredEntity, selectedEntities]);
-
-  useEffect(() => {
-    setSelectedEntities(new Set(initialEntities));
-    setNewEntities(true);
-  }, [initialEntities]);
-
-  useEffect(() => {
-    setSortColumn(DEFAULT_SORT_COLUMN);
-  }, [view.mode]);
 
   const handleCrumbClick = useCallback((idx) => {
     setChartCompanies(false);
