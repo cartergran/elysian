@@ -1,7 +1,13 @@
 import { n } from '../utils.js';
 import pool from '../infra/db.js';
 
-export const CONNECTION_ERROR_CODES = new Set(['ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'PROTOCOL_CONNECTION_LOST']);
+export const CONNECTION_ERROR_CODES = new Set([
+  'EADDRNOTAVAIL',
+  'ETIMEDOUT',
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'PROTOCOL_CONNECTION_LOST'
+]);
 const MAX_QUERY_RETRIES = 3;
 
 async function queryWithRetry(sql) {
