@@ -244,6 +244,7 @@ const Dashboard = () => {
     portfolioData,
     selectedColumn,
     selectedEntities,
+    showSelectedOnly,
     sortColumn,
     visibleEntities
   }), [
@@ -252,6 +253,7 @@ const Dashboard = () => {
     portfolioData,
     selectedColumn,
     selectedEntities,
+    showSelectedOnly,
     sortColumn,
     visibleEntities
   ]);

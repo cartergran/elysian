@@ -40,6 +40,8 @@ const FundView = ({
   portfolioData,
   selectableColumnHeader,
   selectedColumn,
+  selectedEntities,
+  showSelectedOnly,
   visibleEntities,
   FilterHeaderCell,
   onColumnHeaderClick,
@@ -50,22 +52,32 @@ const FundView = ({
   const theme = useTheme();
   const entityColors = theme.palette.entities;
 
-  const rows = useMemo(() => portfolioData.map(({ companyName, investmentRounds }) => {
-    const currentInvestment = investmentRounds.at(-1);
-    const returnPercent = calcReturnPercent(
-      currentInvestment.totalValue,
-      currentInvestment.investedCapital
-    );
+  const rows = useMemo(() => {
+    let retVal = {};
 
-    return {
-      companyName,
-      investedCapital: currentInvestment.investedCapital,
-      totalValue: currentInvestment.totalValue,
-      realizedValue: currentInvestment.realizedValue,
-      unrealizedValue: currentInvestment.unrealizedValue,
-      returnPercent
-    };
-  }), [portfolioData, filterPeriod]);
+    if (chartCompanies && showSelectedOnly) {
+      retVal = portfolioData.filter(({ companyName }) => selectedEntities.has(companyName));
+    } else {
+      retVal = portfolioData;
+    }
+
+    return retVal.map(({ companyName, investmentRounds }) => {
+      const currentInvestment = investmentRounds.at(-1);
+      const returnPercent = calcReturnPercent(
+        currentInvestment.totalValue,
+        currentInvestment.investedCapital
+      );
+
+      return {
+        companyName,
+        investedCapital: currentInvestment.investedCapital,
+        totalValue: currentInvestment.totalValue,
+        realizedValue: currentInvestment.realizedValue,
+        unrealizedValue: currentInvestment.unrealizedValue,
+        returnPercent
+      };
+    });
+  }, [chartCompanies, portfolioData, selectedEntities, showSelectedOnly, filterPeriod]);
 
   const companyEntities = useMemo(() => rows.map((r) => r.companyName), [rows]);
   const handleSelectableHeaderClick = (e) => {
