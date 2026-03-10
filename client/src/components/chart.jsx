@@ -131,7 +131,7 @@ const EntityLine = memo(({
 const ANIMATION_DURATION = 1400; // ms
 const MAX_ENTITIES_FOR_DETAILS = 5; // i.e. dots & tooltip
 
-const Chart = ({
+const Chart = memo(({
   chartData,
   dataLabel = 'Total Value',
   newEntities,
@@ -224,6 +224,6 @@ const Chart = ({
       </LineChart>
     </StyledChart>
   );
-};
+});
 
 export default Chart;
