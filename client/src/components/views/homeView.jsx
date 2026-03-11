@@ -1,7 +1,6 @@
 import {
   Link,
   TableBody,
-  TableCell,
   TableHead,
   TableRow
 } from '@mui/material';
@@ -9,10 +8,22 @@ import styled from 'styled-components';
 import { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
+import { ColoredName, DataCell, HIDE_ON_MOBILE_INDICES, NameCell } from '../tableStyles';
 import { formatCurrency, calcReturnPercent } from '../../utils/investments';
 
-const ColoredFundName = styled(Link)`
-  color: ${({ $color }) => $color};
+const FundNameLink = styled(ColoredName).attrs({ as: Link })`
+  max-width: 100%;
+  min-height: 32px;
+
+  display: inline-block;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    min-height: 44px;
+  }
 `;
 
 const HomeView = ({
@@ -50,11 +61,12 @@ const HomeView = ({
     <>
       <TableHead>
         <TableRow>
-          { <TableCell>{selectableColumnHeader}</TableCell> }
+          { <NameCell>{selectableColumnHeader}</NameCell> }
           {
             Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
               <FilterHeaderCell
                 key={title}
+                $hideOnMobile={HIDE_ON_MOBILE_INDICES.has(idx)}
                 $selectable={filterColumnHeaders.includes(title)}
                 $selected={idx === selectedColumn.idx}
                 onClick={() =>
@@ -88,8 +100,8 @@ const HomeView = ({
 
             return (
               <TableRow key={fundName} hover>
-                <TableCell>
-                  <ColoredFundName
+                <NameCell>
+                  <FundNameLink
                     key={fundName}
                     component="button"
                     underline="hover"
@@ -97,13 +109,13 @@ const HomeView = ({
                     onClick={() => onFundNameClick(fundName)}
                   >
                     {fundName}
-                  </ColoredFundName>
-                </TableCell>
+                  </FundNameLink>
+                </NameCell>
                 {
                   cells.map((cell, idx) => (
-                    <TableCell key={idx}>
+                    <DataCell key={idx} $hideOnMobile={HIDE_ON_MOBILE_INDICES.has(idx)}>
                       {cell}
-                    </TableCell>
+                    </DataCell>
                   ))
                 }
               </TableRow>

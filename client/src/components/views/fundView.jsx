@@ -1,7 +1,6 @@
 import {
   // TODO: Link,
   TableBody,
-  TableCell,
   TableHead,
   TableRow,
   Typography
@@ -10,19 +9,14 @@ import styled from 'styled-components';
 import { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
+import { ColoredName, DataCell, HIDE_ON_MOBILE_INDICES, NameCell } from '../tableStyles';
 import { formatCurrency, calcReturnPercent } from '../../utils/investments';
 
-const ColoredCompanyName = styled(Typography)`
-  color: ${({ $color }) => $color};
-`;
+const CompanyName = styled(ColoredName).attrs({ as: Typography })``;
 
 const FadedTableRow = styled(TableRow)`
   opacity: ${({ $isVisible }) => $isVisible ? 1 : 0.25};
   transition: opacity 0.25s ease;
-`;
-
-const SelectableTableCell = styled(TableCell)`
-  cursor: ${({ $selectable }) => $selectable ? 'pointer' : 'default'};
 `;
 
 // const ToggleCell = styled(TableCell)`
@@ -90,17 +84,18 @@ const FundView = ({
       <TableHead>
         <TableRow>
           {
-            <SelectableTableCell
+            <NameCell
               $selectable={chartCompanies}
               onClick={handleSelectableHeaderClick}
             >
               {selectableColumnHeader}
-            </SelectableTableCell>
+            </NameCell>
           }
           {
             Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
               <FilterHeaderCell
                 key={title}
+                $hideOnMobile={HIDE_ON_MOBILE_INDICES.has(idx)}
                 $selectable={filterColumnHeaders.includes(title)}
                 $selected={idx === selectedColumn.idx}
                 onClick={() =>
@@ -148,25 +143,25 @@ const FundView = ({
                 }}
               >
                 {
-                  <SelectableTableCell
+                  <NameCell
                     $selectable={chartCompanies}
                     {...chartCompanies && {
                       onClick: handleSelectableCellClick
                     }}
                   >
-                    <ColoredCompanyName
+                    <CompanyName
                       variant="span"
                       $color={entityColors[idx % entityColors.length]}
                     >
                       {companyName}
-                    </ColoredCompanyName>
-                  </SelectableTableCell>
+                    </CompanyName>
+                  </NameCell>
                 }
                 {
                   cells.map((cell, idx) => (
-                    <TableCell key={idx}>
+                    <DataCell key={idx} $hideOnMobile={HIDE_ON_MOBILE_INDICES.has(idx)}>
                       {cell}
-                    </TableCell>
+                    </DataCell>
                   ))
                 }
               </FadedTableRow>

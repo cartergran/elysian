@@ -5,10 +5,10 @@ import {
   MenuItem,
   Select,
   Table,
-  TableCell,
   TableContainer,
 } from '@mui/material';
 
+import { FilterHeaderCell } from './tableStyles';
 import FundView from './views/fundView';
 import HomeView from './views/homeView';
 
@@ -22,22 +22,6 @@ const viewRegistry = {
   HOME: HomeView,
   FUND: FundView
 };
-
-const FilterHeaderCell = styled(TableCell)`
-  color:
-    ${({ theme, $selected  }) => $selected
-      ? theme.palette.primary.light
-      : theme.palette.text.primary
-    };
-  font-size:
-    ${({ theme, $selected  }) => $selected
-      ? theme.typography.subtitle1.fontSize
-      : theme.typography.subtitle2.fontSize
-    };
-  cursor: ${({ $selectable }) => $selectable ? 'pointer' : 'default'};
-  transition: all 0.25s ease-in-out;
-  user-select: none;
-`;
 
 const StyledPortfolio = styled.div`
   width: 100%;
