@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 
-import { ColoredName, DataCell, HIDE_ON_MOBILE_INDICES, NameCell } from '../tableStyles';
+import { ColoredName, DataCell, NameCell } from '../tableStyles';
 import { formatCurrency, calcReturnPercent } from '../../utils/investments';
 
 const CompanyName = styled(ColoredName).attrs({ as: Typography })``;
@@ -31,6 +31,7 @@ const FundView = ({
   columnHeadersByDataPoint,
   filterColumnHeaders,
   filterPeriod,
+  mobileColumn,
   portfolioData,
   selectableColumnHeader,
   selectedColumn,
@@ -45,6 +46,11 @@ const FundView = ({
 }) => {
   const theme = useTheme();
   const entityColors = theme.palette.entities;
+
+  const columnKeys = Object.keys(columnHeadersByDataPoint);
+  const mobileColumnIdx = columnKeys.indexOf(mobileColumn);
+  const returnPercentIdx = columnKeys.length - 1;
+  const isHiddenOnMobile = (idx) => idx !== mobileColumnIdx && idx !== returnPercentIdx;
 
   const rows = useMemo(() => {
     let retVal = {};
@@ -95,7 +101,7 @@ const FundView = ({
             Object.entries(columnHeadersByDataPoint).map(([dataPoint, title], idx) => (
               <FilterHeaderCell
                 key={title}
-                $hideOnMobile={HIDE_ON_MOBILE_INDICES.has(idx)}
+                $hideOnMobile={isHiddenOnMobile(idx)}
                 $selectable={filterColumnHeaders.includes(title)}
                 $selected={idx === selectedColumn.idx}
                 onClick={() =>
@@ -159,7 +165,7 @@ const FundView = ({
                 }
                 {
                   cells.map((cell, idx) => (
-                    <DataCell key={idx} $hideOnMobile={HIDE_ON_MOBILE_INDICES.has(idx)}>
+                    <DataCell key={idx} $hideOnMobile={isHiddenOnMobile(idx)}>
                       {cell}
                     </DataCell>
                   ))

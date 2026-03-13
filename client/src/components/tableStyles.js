@@ -1,9 +1,6 @@
 import styled from 'styled-components';
 import { TableCell } from '@mui/material';
 
-// hides columns: [1] invested capital, [2] realized value, [3] unrealized value
-export const HIDE_ON_MOBILE_INDICES = new Set([1, 2, 3]);
-
 export const ColoredName = styled('span')`
   color: ${({ $color }) => $color};
 `;

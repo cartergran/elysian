@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { useCallback, useMemo, useState } from 'react';
+import { useMediaQuery } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom'
+import { useTheme } from '@mui/material/styles';;
 
 import Chart from './chart';
 import Filter from './filter';
@@ -8,7 +10,7 @@ import Header from './header';
 import Portfolio from './portfolio';
 
 import { calcReturnPercent, toChartData } from '../utils/investments';
-import { DEFAULT_SELECTED_COLUMN, DEFAULT_SORT_COLUMN } from '../utils/portfolio';
+import { COLUMN_HEADERS_BY_DATA_POINT, DEFAULT_SELECTED_COLUMN, DEFAULT_SORT_COLUMN } from '../utils/portfolio';
 import { slugify, deslugify } from '../utils/helpers';
 import { useFunds } from '../hooks/funds';
 
@@ -41,11 +43,14 @@ const lastPeriod = (p, arr) => p === Infinity ? arr : arr.slice(-(p + 1));
 const Dashboard = () => {
   const { fundSlug, companySlug } = useParams();
   const nav = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   // TODO: loading, isError, error
   const { data: funds = [], isLoading: loading, isError, error } = useFunds();
 
   const [chartCompanies, setChartCompanies] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(Infinity);
+  const [mobileColumn, setMobileColumn] = useState(DEFAULT_SORT_COLUMN);
   const [selectedColumn, setSelectedColumn] = useState(DEFAULT_SELECTED_COLUMN);
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
   const [sortColumn, setSortColumn] = useState(DEFAULT_SORT_COLUMN);
@@ -71,6 +76,7 @@ const Dashboard = () => {
   // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
   const [prevViewMode, setPrevViewMode] = useState(view.mode);
   if (view.mode !== prevViewMode) {
+    setMobileColumn(DEFAULT_SORT_COLUMN);
     setPrevViewMode(view.mode);
     setSortColumn(DEFAULT_SORT_COLUMN);
   }
@@ -205,6 +211,19 @@ const Dashboard = () => {
     return next;
   }, [hoveredEntity, selectedEntities]);
 
+  const handleSortChange = useCallback((column) => {
+    setSortColumn(column);
+    if (column !== 'returnPercent') {
+      setMobileColumn(column);
+
+      if (isMobile) {
+        const headers = COLUMN_HEADERS_BY_DATA_POINT[view.mode] || {};
+        const columnKeys = Object.keys(headers);
+        setSelectedColumn({ idx: columnKeys.indexOf(column), title: headers[column], dataPoint: column });
+      }
+    }
+  }, [isMobile, view.mode]);
+
   const handleCrumbClick = useCallback((idx) => {
     setChartCompanies(false);
     setSelectedColumn(DEFAULT_SELECTED_COLUMN);
@@ -241,6 +260,7 @@ const Dashboard = () => {
   const model = useMemo(() => ({
     chartCompanies,
     filterPeriod,
+    mobileColumn,
     portfolioData,
     selectedColumn,
     selectedEntities,
@@ -250,6 +270,7 @@ const Dashboard = () => {
   }), [
     chartCompanies,
     filterPeriod,
+    mobileColumn,
     portfolioData,
     selectedColumn,
     selectedEntities,
@@ -262,11 +283,12 @@ const Dashboard = () => {
     onColumnHeaderClick: setSelectedColumn,
     onFundNameClick: handleFundNameClick,
     onHoverRow: setHoveredEntity,
-    onSortChange: setSortColumn,
+    onSortChange: handleSortChange,
     onToggleRow: handleToggleRow,
     onToggleRows: handleToggleRows
   }), [
     handleFundNameClick,
+    handleSortChange,
     handleToggleRow,
     handleToggleRows
   ]);
