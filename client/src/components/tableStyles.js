@@ -40,13 +40,14 @@ export const FilterHeaderCell = styled(TableCell)`
 `;
 
 export const NameCell = styled(TableCell)`
-  max-width: 120px;
-
   cursor: ${({ $selectable }) => ($selectable ? 'pointer' : 'default')};
   overflow: hidden;
-  padding: ${({ theme }) => theme.spacing(1)};
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    max-width: 120px;
+  }
 
   ${({ theme }) => theme.breakpoints.up('md')} {
     max-width: 200px;

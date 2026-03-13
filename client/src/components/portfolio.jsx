@@ -43,6 +43,14 @@ const ScrollableTableContainer = styled(TableContainer)`
   overflow-y: auto;
 `;
 
+const StyledTable = styled(Table)`
+  table-layout: fixed;
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    table-layout: auto;
+  }
+`;
+
 const Portfolio = ({ model, view, controller }) => {
   const ActiveView = viewRegistry[view.mode] || (() => null);
   const columnHeadersByDataPoint = COLUMN_HEADERS_BY_DATA_POINT[view.mode] || {};
@@ -67,7 +75,7 @@ const Portfolio = ({ model, view, controller }) => {
         </Select>
       </SortableFormControl>
       <ScrollableTableContainer>
-        <Table stickyHeader>
+        <StyledTable stickyHeader>
           <ActiveView
             columnHeadersByDataPoint={columnHeadersByDataPoint}
             filterColumnHeaders={FILTER_COLUMN_HEADERS[view.mode]}
@@ -76,7 +84,7 @@ const Portfolio = ({ model, view, controller }) => {
             {...model}
             {...controller}
           />
-        </Table>
+        </StyledTable>
       </ScrollableTableContainer>
     </StyledPortfolio>
   );
