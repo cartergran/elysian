@@ -211,6 +211,21 @@ const Dashboard = () => {
     return next;
   }, [hoveredEntity, selectedEntities]);
 
+  const handleColumnHeaderClick = useCallback((next) => {
+    setSelectedColumn((prev) => prev.idx === next.idx ? prev : next);
+  }, []);
+
+  const handleCrumbClick = useCallback((idx) => {
+    setChartCompanies(false);
+    setSelectedColumn(DEFAULT_SELECTED_COLUMN);
+    navByIdx[idx]();
+  }, [navByIdx]);
+
+  const handleFundNameClick = useCallback((fundName) => {
+    setSelectedColumn(DEFAULT_SELECTED_COLUMN);
+    goFund(fundName);
+  }, [goFund]);
+
   const handleSortChange = useCallback((column) => {
     setSortColumn(column);
     if (column !== 'returnPercent') {
@@ -223,17 +238,6 @@ const Dashboard = () => {
       }
     }
   }, [isMobile, view.mode]);
-
-  const handleCrumbClick = useCallback((idx) => {
-    setChartCompanies(false);
-    setSelectedColumn(DEFAULT_SELECTED_COLUMN);
-    navByIdx[idx]();
-  }, [navByIdx]);
-
-  const handleFundNameClick = useCallback((fundName) => {
-    setSelectedColumn(DEFAULT_SELECTED_COLUMN);
-    goFund(fundName);
-  }, [goFund]);
 
   const handleToggleRow = useCallback((entityName) => {
     setSelectedEntities(prev => {
@@ -280,13 +284,14 @@ const Dashboard = () => {
   ]);
 
   const controller = useMemo(() => ({
-    onColumnHeaderClick: setSelectedColumn,
+    onColumnHeaderClick: handleColumnHeaderClick,
     onFundNameClick: handleFundNameClick,
     onHoverRow: setHoveredEntity,
     onSortChange: handleSortChange,
     onToggleRow: handleToggleRow,
     onToggleRows: handleToggleRows
   }), [
+    handleColumnHeaderClick,
     handleFundNameClick,
     handleSortChange,
     handleToggleRow,
