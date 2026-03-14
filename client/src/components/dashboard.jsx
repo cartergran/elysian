@@ -28,7 +28,11 @@ const StyledDashboard = styled.div`
 
   width: 100%;
 
-  padding: ${({ theme }) => theme.spacing(4)};
+  padding: ${({ theme }) => theme.spacing(2)};
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    padding: ${({ theme }) => theme.spacing(4)};
+  }
 `;
 
 const FILTERS = [
