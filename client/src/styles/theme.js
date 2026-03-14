@@ -81,7 +81,8 @@ const extendedMuiTheme = createTheme(muiTheme, {
         // working in Chrome, Firefox, and Safari
         '*': {
           scrollbarColor: `${muiTheme.palette.secondary.light} transparent`,
-          scrollbarWidth: 'thin'
+          scrollbarWidth: 'thin',
+          WebkitTapHighlightColor: 'transparent'
         }
       }
     },
