@@ -92,7 +92,7 @@ const FundView = ({
           {
             <NameCell
               $selectable={chartCompanies}
-              onClick={handleSelectableHeaderClick}
+              onClick={showSelectedOnly ? handleSelectableHeaderClick : undefined}
             >
               {selectableColumnHeader}
             </NameCell>
